@@ -1,12 +1,14 @@
 # Manuel Lämmle
 
-Professor für Energieinformatik und Gebäudeenergietechnik
+- Professor für Energieinformatik und Gebäudeenergietechnik
 
-- 0781 205-4773
+- Hochschule Offenburg, Badstraße 24, 77652 Offenburg
+
+- Institut für Nachhaltige Energiesysteme (INES)
+
+- Leitung Forschungsgruppe E2G (Energieeffiziente Gebäude)
+
 - manuel.laemmle@hs-offenburg.de
-- https://scholar.google.de/citations?user=4mbr7F8AAAAJ
-- Raum: 3.05
-- Badstraße 24, 77652 Offenburg
 
 
 
@@ -30,8 +32,10 @@ Professor für Energieinformatik und Gebäudeenergietechnik
 
 - TRAIL: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
 
-##  Lehre
+## Veröffentlichungen
+[Publications](publications)
 
+##  Lehre
 - Energy Data Engineering 1 + 2
 - Bauphysik
 - Erneuerbare Energien 1 + 2
