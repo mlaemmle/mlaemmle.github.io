@@ -21,7 +21,7 @@
 
 
 ## Veröffentlichungen
-[Publikatinsübersicht](publications)
+[Publikationsübersicht](publications)
 
 ##  Lehre
 [Übersicht Lehrveranstaltungen](teaching)
