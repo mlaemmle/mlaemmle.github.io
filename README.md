@@ -2,12 +2,13 @@
 
 Professor für Energieinformatik und Gebäudeenergietechnik
 
-- Data Engineering, Gebäudetechnik, Erneuerbare Energien
 - 0781 205-4773
 - manuel.laemmle@hs-offenburg.de
 - https://scholar.google.de/citations?user=4mbr7F8AAAAJ
 - Raum: 3.05
 - Badstraße 24, 77652 Offenburg
+
+
 
 ## Akademischer Werdegang
 
@@ -28,3 +29,13 @@ Professor für Energieinformatik und Gebäudeenergietechnik
 - SQ-DurlachII: Demonstration von skalierbaren Lösungen und Entwicklung von digitalen Methoden für Planung, Umsetzung und Betrieb von integrierten Energiekonzepten mit Großwärmepumpen in Bestandsquartieren.
 
 - TRAIL: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
+
+##  Lehre
+
+- Energy Data Engineering 1 + 2
+- Bauphysik
+- Erneuerbare Energien 1 + 2
+- Renewable Heating and Cooling
+- Ingenieursinformatik
+- GuD und BHKW
+
