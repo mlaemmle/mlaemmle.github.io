@@ -11,6 +11,20 @@
 - manuel.laemmle@hs-offenburg.de
 
 
+## Forschungsprojekte
+
+- SQ-DurlachII: Demonstration von skalierbaren Lösungen und Entwicklung von digitalen Methoden für Planung, Umsetzung und Betrieb von integrierten Energiekonzepten mit Großwärmepumpen in Bestandsquartieren.
+
+- TRAIL: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
+
+[Übersicht Forschungsprojekte](research)
+
+
+## Veröffentlichungen
+[Publikatinsübersicht](publications)
+
+##  Lehre
+[Übersicht Lehrveranstaltungen](teaching)
 
 ## Akademischer Werdegang
 
@@ -25,21 +39,3 @@
 - 2018: Promotion "Thermal Management of PVT collectors" an der Universität Freiburg
 
 - 2006 - 2012: Studium Maschinenbau mit Vertiefungsrichtung Energie- und Umwelttechnik am Karlsruhe-Institut für Technologie (KIT)
-
-## Forschungsprojekte
-
-- SQ-DurlachII: Demonstration von skalierbaren Lösungen und Entwicklung von digitalen Methoden für Planung, Umsetzung und Betrieb von integrierten Energiekonzepten mit Großwärmepumpen in Bestandsquartieren.
-
-- TRAIL: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
-
-## Veröffentlichungen
-[Publications](publications)
-
-##  Lehre
-- Energy Data Engineering 1 + 2
-- Bauphysik
-- Erneuerbare Energien 1 + 2
-- Renewable Heating and Cooling
-- Ingenieursinformatik
-- GuD und BHKW
-
