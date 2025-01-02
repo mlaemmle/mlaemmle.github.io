@@ -6,9 +6,7 @@
 
 - Grundlagen Erneuerbare Energietechnik
 
-- Data Science
-
-- Digitialisierung
+- Data Engineering und Data Science
 
 - Smart Cities und Smart Buildings
 
@@ -48,13 +46,13 @@
 
 	- Universität Freiburg, Technische Fakultät, Master-Studiengang Sustainable Systems Engineering (SSE)
 
-Energy in Buildings 2: components and systems for energy supply
+- Energy in Buildings 2: components and systems for energy supply
 
 	- Vorlesungsinhalte: Kompontenen und Systeme der Gebäudeenergietechnik, Wirtschaftliche und Ökologische Bewertung, Energiekonzepte für Gebäude und Quartiere
 
 	- Universität Freiburg, Technische Fakultät, Wahlfach Master-Studiengang Sustainable Systems Engineering (SSE) 
 
-Solar Energy
+- Solar Energy
 
 	- Pflichtvorlesung „Grundlagen der Solarenergie“
 
@@ -65,7 +63,7 @@ Solar Energy
 	- Universität Freiburg, Technische Fakultät, Pflichtfach Master-Studiengang Sustainable Systems Engineering (SSE) 
 
 
-Solar Thermal Energy 1 + 2
+- Solar Thermal Energy 1 + 2
 
 	- Wahlvorlesung zu Solarthermie-Systemen
 
@@ -81,7 +79,6 @@ Solar Thermal Energy 1 + 2
 
 
 ## Begutachtung von Master- und Bachelorand*innen
-
 
 - Herausforderungen und Lösungsansätze bei der Implementierung der BIM-Methodik in den Arbeitsprozessen der TGA-Planung am Beispiel einer Energiezentrale
 
@@ -113,18 +110,7 @@ Solar Thermal Energy 1 + 2
 
 
 ## Baden-Württemberg-Zertifikat für Hochschuldidaktik  
+
 - Modul I „Grundlagen des Lehrens und Lernens“
 
-	- Seminar zu Hochschuldidaktischen Grundlagen „Fit für die Lehre 1 und 2“
-
-- Grundlagen der kompzentorienteten Didaktik
-
-- Aktivierende Lehrstrategien und -methoden
-
-- Ziele und Methoden der Lernerfolgs- und Leistungsevaluation
-
-	- Kollegiale Lehrhospitation, Praxisberatung, Didaktische Reflexion
-
-	- Kursumfang: 60 Akademische Einheiten à 45 Minuten
-
-	- Abschluss von Modul I des Baden-Württemberg-Zertifikat im April 2021
+- Kollegiale Lehrhospitation, Praxisberatung, Didaktische Reflexion
