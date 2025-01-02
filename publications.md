@@ -1,17 +1,22 @@
 
-# Publication lists
+# Publication list
+Last update: 02.01.2025
+
+## Profile
 
 - Orcid ID: [https://orcid.org/0000-0001-5931-7975](https://orcid.org/0000-0001-5931-7975)
 
-- Profile bei Google Scholar: [https://scholar.google.com/citations?user=4mbr7F8AAAAJ](https://scholar.google.com/citations?user=4mbr7F8AAAAJ)
+- Google Scholar: [https://scholar.google.com/citations?user=4mbr7F8AAAAJ](https://scholar.google.com/citations?user=4mbr7F8AAAAJ)
 
--  Profil bei Researchgate: [https://www.researchgate.net/profile/Manuel-Laemmle](https://www.researchgate.net/profile/Manuel-Laemmle)
+- Researchgate: [https://www.researchgate.net/profile/Manuel-Laemmle](https://www.researchgate.net/profile/Manuel-Laemmle)
 
-## Peer reviewed articles as main author:
+- [OPUS HS Offenburg](https://opus.hs-offenburg.de/solrsearch/index/search/searchtype/authorsearch/author/L%C3%A4mmle%2C+Manuel)
+
+## Peer reviewed articles as main author
 
 - Lämmle, Manuel, Metz, Jakob, Kropp, M., Wapler, J., Oltersdorf, T., Günther, D., Herkel, S., Bongs, C., 2023. Heat Pump systems in existing multi‐family buildings: a meta‐analysis of field measurement data focusing on the relationship of temperature and performance of heat pump systems. Energy Technology. [https://doi.org/10.1002/ente.202300379](https://doi.org/10.1002/ente.202300379). 
 
-- Lämmle, Manuel; Bongs, Constanze, Wapler, Jeannette, Günther, Danny; Hess, Stefan; Kropp, Michael; Herkel, Sebastian (2021): Performance of air and ground source heat pumps retrofitted to radiator heating systems and measures to reduce space heating temperatures in existing buildings. Energy, 122952.  [https://doi.org/10.1016/j.energy.2021.122952](%20https:/doi.org/10.1016/j.energy.2021.122952). 
+- Lämmle, Manuel; Bongs, Constanze, Wapler, Jeannette, Günther, Danny; Hess, Stefan; Kropp, Michael; Herkel, Sebastian (2021): Performance of air and ground source heat pumps retrofitted to radiator heating systems and measures to reduce space heating temperatures in existing buildings. Energy, 122952.  [https://doi.org/10.1016/j.energy.2021.122952](https:/doi.org/10.1016/j.energy.2021.122952). 
 
 - Lämmle, Manuel; Hermann, Michael; Kramer, Korbinian; Panzer, Clemens; Piekarczyk, Andreas; Thoma, Christoph; Fahr, Sven (2018): Development of highly efficient, glazed PVT collectors with overheating protection to increase reliability and enhance energy yields. [https://doi.org/10.1016/j.solener.2018.09.082](https://doi.org/10.1016/j.solener.2018.09.082) 
 
@@ -21,7 +26,7 @@
 
 - Lämmle, Manuel; Thoma, Christoph; Hermann, Michael (2016): A PVT Collector Concept with Variable Film Insulation and Low‑emissivity Coating. Energy Procedia 91, pp. 72–77. [https://doi.org/10.1016/j.egypro.2016.06.174](https://doi.org/10.1016/j.egypro.2016.06.174) 
 
-## Peer reviewed articles as co-author:
+## Peer reviewed articles as co-author
 
 - Kropp, M., Lämmle, M., Herkel, S., Henning, H.-M., Velte-Schäfer, A., 2025. Enhancing heat pump performance for domestic hot water preparation: A comparative analysis in existing multi-family houses. Energy and Buildings 328, 115155. [https://doi.org/10.1016/j.enbuild.2024.115155](https://doi.org/10.1016/j.enbuild.2024.115155)
 
@@ -35,7 +40,7 @@
 
 - Jonas, Danny; Lämmle, Manuel; Theis, Danjana; Schneider, Sebastian; Frey, Georg (2019): Performance modeling of PVT collectors: implementation, validation and parameter identification approach using TRNSYS.Solar Energy (193), S. 51–64. [https://doi.org/10.1016/j.solener.2019.09.047](https://doi.org/10.1016/j.solener.2019.09.047)
 
-## Conference articles with peer-review:
+## Conference articles with peer-review
 
 - Lämmle, Manuel; Allen, Amy; Pless, Shanti; Henze, Gregor (2022): Valuation of Novel Waste Heat Sources in Fifth Generation District Heating and Cooling (5GDHC) netwoks and a Path Towards Adoption. In: 2022 ACEEE Summer Study on Energy Efficiency in Pacific Grove (NREL/CP-5500-83352). [https://www.nrel.gov/docs/fy22osti/83352.pdf](https://www.nrel.gov/docs/fy22osti/83352.pdf)
   
@@ -62,7 +67,7 @@
 - Lämmle, Manuel; Kroyer, Thomas; Fortuin, Stefan; Hermann, Michael (2014): Modelling Results of Covered PVT Collectors Regarding Low‑e Coatings and F'. Eurosun2014 - ISES Proceedings, pp. 1–10. DOI: 10.18086/eurosun.2014.16.14.
 
 
-## Conference articles without peer-review:
+## Conference articles without peer-review
 
 - Munz, Gunther; Hesse, Gunther; Wartusch, Volker; Lämmle, Manuel; Helmling, Sebastian; Mehnert, Stefan (2022): PVT-Kollektoren als Luftwärmeübertrager - Leistungscharakterisierung und Performance in einem Wärmepumpensystem. In: Tagungsband 32. Symposium Solarthermie und innovative Wärmesysteme.
 
@@ -82,27 +87,18 @@
 
 - Lämmle, Manuel; Hermann, Michael (2015): Thermisches Management von PVT-Kollektoren - Ergebnisse aus Systemsimulationen. Tagungsband 25. Symposium Thermische Solarenergie 2015. Bad Staffelsein: OTTI-Kolleg.
 
+## Books and Chapters
 
+- Herkel, Sebastian; Lämmle, Manuel; Munz, Gunther; Bacher, Jean-Philippe; Boesiger, Martin; Couty, Philippe et al. (2021): Competition & Living Lab Platform (Annex 74) Science & Technology (Subtask A) Focus Report 2: Topical Paper. Unter Mitarbeit von Bergische Universität Wuppertal. [https://doi.org/10.25926/3f99-xy74](https://doi.org/10.25926/3f99-xy74).
 
+- Lämmle, Manuel (2018): Thermal management of PVT collectors - development and modelling of highly efficient PVT collectors with low-emissivity coatings and overheating protection.PhD thesis, Fraunhofer ISE, INATECH Albert-Ludwigs-Universität Freiburg. [https://doi.org/10.6094/UNIFR/16446](https://doi.org/10.6094/UNIFR/16446)
+  Ebenfalls erschienen im Fraunhofer Verlag, ISBN 978-3-8396-1436-5. 
 
-
-
-
-
-
-
-
-
-
-## Bücher und Buchkapitel:
-
-- Herkel, Sebastian; Lämmle, Manuel; Munz, Gunther; Bacher, Jean-Philippe; Boesiger, Martin; Couty, Philippe et al. (2021): Competition & Living Lab Platform (Annex 74) Science & Technology (Subtask A) Focus Report 2: Topical Paper. Unter Mitarbeit von Bergische Universität Wuppertal. https://doi.org/10.25926/3f99-xy74.
-
-- Lämmle, Manuel (2018): Thermal management of PVT collectors - development and modelling of highly efficient PVT collectors with low-emissivity coatings and overheating protection.PhD thesis, Fraunhofer ISE, INATECH Albert-Ludwigs-Universität Freiburg. FreiDok doi: 10.6094/UNIFR/16446. Ebenfalls erschienen im Fraunhofer Verlag, ISBN 978-3-8396-1436-5. 14 Zitationen.
-
-## Sonstige Publikationen:
+## Other publications: Project reports, articles
 
 - Kropp, M., Lämmle, M., Schauer, C., Reiter, F., 2023. Niedrigere Trinkwarmwasser-Systemtemperaturen bringen Wärmepumpen in die Breite. HLH : Lüftung, Klima, Heizung, Sanitär, Gebäudetechnik 74, 32–37. [https://doi.org/10.37544/1436-5103-2023-09-32](https://doi.org/10.37544/1436-5103-2023-09-32)
+
+- Sawant, P.A., Pfafferott, J., Bürger, A., Bongs, C., Braasch, C., Glatz, S., Huber, H., Koch, Manuel, Koch, Matthias, Lämmle, M., 2023. Aktuelle Herausforderungen für den Betrieb von dezentralen Energieverbundsystemen. BWK: Energie 75, 53–55.
 
 - Bongs, C., Lämmle, M., Schmidt, F., 2023. Wärmepumpen für Mehrfamilienhäuser im Bestand : LowEx-Konzepte für die Wärmeversorung von Mehrfamilien-Bestandsgebäuden : Handreichung für die Umsetzung. [https://lowex-bestand.de/wp-content/uploads/2023/10/Handreichung_WP-im-MFH-Bestand_final.pdf](https://lowex-bestand.de/wp-content/uploads/2023/10/Handreichung_WP-im-MFH-Bestand_final.pdf)
 
@@ -112,13 +108,13 @@
 
 - Bongs, Constanze; Lämmle, Manuel; Schmidt, Ferdinand (2022): Abschlussbericht LowEx-Bestand Analyse. LowEx-Konzepte für die Wärmeversorgung von Mehrfamilien-Bestandsgebäuden.
 
-- Lämmle, Manuel; Herrando, María; Ryan, Glen (2020): Basic concepts of PVT collector technologies, applications and markets -. SHC Task 60/Report D5. IEA SHC Task 60. DOI: 10.18777/ieashc-task60-2020-0002.  **17** Zitationen
+- Lämmle, Manuel; Herrando, María; Ryan, Glen (2020): Basic concepts of PVT collector technologies, applications and markets -. SHC Task 60/Report D5. IEA SHC Task 60. [https://doi.org/10.18777/ieashc-task60-2020-0002](https://doi.org/10.18777/ieashc-task60-2020-0002).  
 
-- Kramer, Korbinian; Lämmle, Manuel et al. (2020): Satus Quo of PVT Characerztation. SHC Task 60 - Reprt B1. In: _IEA SHC Task 60 | PVT Systems_. DOI: 10.18777/ieashc-task60-2020-0004.
+- Kramer, Korbinian; Lämmle, Manuel et al. (2020): Satus Quo of PVT Characterization. SHC Task 60 - Reprt B1. In: _IEA SHC Task 60 | PVT Systems_. [https://doi.org/10.18777/ieashc-task60-2020-0004](https://doi.org/10.18777/ieashc-task60-2020-0004)
 
-- Zenhäusern, Daniel; Gagliano, Antonio; Jonas, Danny; Marco, Guiseppe; Hadorn, Jean-Christophe; Lämmle, Manuel; Herrando, María (2020): Key Performance Indicators for PVT Systems. SHC Task 60, Report D1. In: IEA SHC Task 60 | PVT Systems. DOI: 10.18777/ieashc-task60-2020-0007. **2** Zitationen
+- Zenhäusern, Daniel; Gagliano, Antonio; Jonas, Danny; Marco, Guiseppe; Hadorn, Jean-Christophe; Lämmle, Manuel; Herrando, María (2020): Key Performance Indicators for PVT Systems. SHC Task 60, Report D1. In: IEA SHC Task 60 | PVT Systems. DOI: 10.18777/ieashc-task60-2020-0007. 
 
-- Hadorn, Jean-Christophe; Lämmle, Manuel; Kramer, Korbinian; Munz, Gunther; Herrando, María; Brottier, Laetitia (2020): Design Guidelines for PVT Collectors. SHC Task 60/Report B2/July 2020. In: IEA SHC Task 60. DOI: 10.18777/ieashc-task60-2020-0003. **2** Zitationen.
+- Hadorn, Jean-Christophe; Lämmle, Manuel; Kramer, Korbinian; Munz, Gunther; Herrando, María; Brottier, Laetitia (2020): Design Guidelines for PVT Collectors. SHC Task 60/Report B2/July 2020. In: IEA SHC Task 60. DOI: 10.18777/ieashc-task60-2020-0003. 
 
 - Lämmle, Manuel; Wapler, Jeannette; Kropp, Michael; Hess, Stefan; Hahn, Dennis; David, Gerhard; Herkel, Sebastian (2020): Gezielter Heizkörper-Austausch - Optimierung von Wärmepumpen-Heizungsanlagen. tab-Das Fachmagazin der TGA-Branche 1-2/2020.
 
@@ -134,11 +130,11 @@
 
 - Lämmle, Manuel (2016): Vergleich von PVT-Kollektortechnologien - Wirkungsgradkennwerte, Bruttoerträge, Systemsimulationen. Posterbeitrag zum PVT-Workshop im Vorfeld des OTTI Symposiums Thermische Solarenergie am 19.04.2016.
 
-- Lämmle, Manuel (2012): Assessment of the global potential for CO2 mitigation of carbon capture and storage (CCS) until 2050. Diplomarbeit, Fraunhofer ISI, Karlsruhe Institut für Technologie (KIT). **7** Zitationen.
+- Lämmle, Manuel (2012): Assessment of the global potential for CO2 mitigation of carbon capture and storage (CCS) until 2050. Diplomarbeit, Fraunhofer ISI, Karlsruhe Institut für Technologie (KIT). 
 
- ## Vorträge (Auswahl):
+ ## Presentations (selection)
 
-- 
+- Integration von Abwärme in kalte Nahwärmenetze. 45. Offenburger Wirtschaftsforum. 17.07.2024
 
 - Klimaschutz-Konzept für Bestandsquartiere: Das Forschungsprojekt "Smartes Quartier Karlsruhe-Durlach". Präsentation beim Seminar "Wärmewende" der VKU Akademie. 01.12.2022
 
@@ -165,6 +161,4 @@
 
 - PVT-Workshop des ZAE Bayern, „Abgedeckte PVT-Kollektoren – Stand der Technik und Forschungsthemen“, Bad Staffelstein, 19.04.2016
 
-- Doktorandenkolloquim des Fachgebiets für Strömungsmaschinen am Kalsruher Institut für Technologie (KIT), 02.03.2016: „PVT-Kollektoren mit Low-e Beschichtung und Überhitzungsschutz“
 
-- Konferenzvorträge zu o.g.  Konferenzartikeln
