@@ -14,7 +14,7 @@ RIZ 3.05
 
 Email: [manuel.laemmle@hs-offenburg.de](mailto:manuel.laemmle@hs-offenburg.de)
 
-Privat: [hallo@mlaemmle.de](mailto:hallo@mlaemmle.de)
+Email private: [hallo@mlaemmle.de](mailto:hallo@mlaemmle.de)
 
 Phone: [+49 781 205-4773](tel:00497812054773)
 
