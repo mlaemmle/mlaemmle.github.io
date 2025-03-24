@@ -28,6 +28,8 @@ Last update: 02.01.2025
 
 ## Peer reviewed articles as co-author
 
+- Tomás, L., Lämmle, M., Pfafferott, J., 2025. Demonstration and Evaluation of Model Predictive Control (MPC) for a Real-World Heat Pump System in a Commercial Low-Energy Building for Cost Reduction and Enhanced Grid Support. Energies 18, 1434. [https://doi.org/10.3390/en18061434](https://doi.org/10.3390/en18061434)
+
 - Kropp, M., Lämmle, M., Herkel, S., Henning, H.-M., Velte-Schäfer, A., 2025. Enhancing heat pump performance for domestic hot water preparation: A comparative analysis in existing multi-family houses. Energy and Buildings 328, 115155. [https://doi.org/10.1016/j.enbuild.2024.115155](https://doi.org/10.1016/j.enbuild.2024.115155)
 
 - Jank, R., Lämmle, M., Rink, M., 2023. Wirtschaftlichkeitsbetrachtung eines smarten Energiekonzepts für ein Bestandsquartier in Karlsruhe. Zeitschrift für Energiewirtschaft 47, 36–51. [https://doi.org/10.1007/s12398-023-0929-x](https://doi.org/10.1007/s12398-023-0929-x)
@@ -100,7 +102,7 @@ Last update: 02.01.2025
 
 - Sawant, P.A., Pfafferott, J., Bürger, A., Bongs, C., Braasch, C., Glatz, S., Huber, H., Koch, Manuel, Koch, Matthias, Lämmle, M., 2023. Aktuelle Herausforderungen für den Betrieb von dezentralen Energieverbundsystemen. BWK: Energie 75, 53–55.
 
-- Bongs, C., Lämmle, M., Schmidt, F., 2023. Wärmepumpen für Mehrfamilienhäuser im Bestand : LowEx-Konzepte für die Wärmeversorung von Mehrfamilien-Bestandsgebäuden : Handreichung für die Umsetzung. [https://lowex-bestand.de/wp-content/uploads/2023/10/Handreichung_WP-im-MFH-Bestand_final.pdf](https://lowex-bestand.de/wp-content/uploads/2023/10/Handreichung_WP-im-MFH-Bestand_final.pdf)
+- Bongs, C., Lämmle, M., Schmidt, F., 2023. Wärmepumpen für Mehrfamilienhäuser im Bestand: LowEx-Konzepte für die Wärmeversorung von Mehrfamilien-Bestandsgebäuden: Handreichung für die Umsetzung. [https://lowex-bestand.de/wp-content/uploads/2023/10/Handreichung_WP-im-MFH-Bestand_final.pdf](https://lowex-bestand.de/wp-content/uploads/2023/10/Handreichung_WP-im-MFH-Bestand_final.pdf)
 
 - Kropp, M., Lämmle, M., 2023. Technisch-wissenschaftliche Analyse zur Energieeffizienz unterschiedlicher Trinkwasser-Erwärmungssysteme im Vergleich. [https://doi.org/10.24406/publica-1731](https://doi.org/10.24406/publica-1731)
 

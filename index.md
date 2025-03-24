@@ -8,23 +8,26 @@
 
 - Leitung Forschungsgruppe E2G (Energieeffiziente Gebäude)
 
+- Studiendekan des trinationalen Masterstudiengangs Sustainable Business Development
+
 - manuel.laemmle@hs-offenburg.de
 
 
 ## Forschungsprojekte
+[Übersicht Forschungsprojekte](research)
 
 - SQ-DurlachII: Demonstration von skalierbaren Lösungen und Entwicklung von digitalen Methoden für Planung, Umsetzung und Betrieb von integrierten Energiekonzepten mit Großwärmepumpen in Bestandsquartieren.
 
 - TRAIL: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
 
-[Übersicht Forschungsprojekte](research)
-
 
 ## Veröffentlichungen
 [Publikationsübersicht](publications)
 
+
 ##  Lehre
 [Übersicht Lehrveranstaltungen](teaching)
+
 
 ## Akademischer Werdegang
 
@@ -39,3 +42,5 @@
 - 2018: Promotion "Thermal Management of PVT collectors" an der Universität Freiburg
 
 - 2006 - 2012: Studium Maschinenbau mit Vertiefungsrichtung Energie- und Umwelttechnik am Karlsruhe-Institut für Technologie (KIT)
+
+[Academic CV](cv)
