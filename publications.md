@@ -93,12 +93,14 @@ Last update: 15.04.2025
 
 - Lämmle, Manuel; Hermann, Michael (2015): Thermisches Management von PVT-Kollektoren - Ergebnisse aus Systemsimulationen. Tagungsband 25. Symposium Thermische Solarenergie 2015. Bad Staffelsein: OTTI-Kolleg.
 
+
 ## Books and Chapters
 
 - Herkel, Sebastian; Lämmle, Manuel; Munz, Gunther; Bacher, Jean-Philippe; Boesiger, Martin; Couty, Philippe et al. (2021): Competition & Living Lab Platform (Annex 74) Science & Technology (Subtask A) Focus Report 2: Topical Paper. Unter Mitarbeit von Bergische Universität Wuppertal. [https://doi.org/10.25926/3f99-xy74](https://doi.org/10.25926/3f99-xy74).
 
 - Lämmle, Manuel (2018): Thermal management of PVT collectors - development and modelling of highly efficient PVT collectors with low-emissivity coatings and overheating protection.PhD thesis, Fraunhofer ISE, INATECH Albert-Ludwigs-Universität Freiburg. [https://doi.org/10.6094/UNIFR/16446](https://doi.org/10.6094/UNIFR/16446)
   Ebenfalls erschienen im Fraunhofer Verlag, ISBN 978-3-8396-1436-5. 
+
 
 ## Other publications: Project reports, articles
 
@@ -118,9 +120,9 @@ Last update: 15.04.2025
 
 - Lämmle, Manuel; Herrando, María; Ryan, Glen (2020): Basic concepts of PVT collector technologies, applications and markets -. SHC Task 60/Report D5. IEA SHC Task 60. [https://doi.org/10.18777/ieashc-task60-2020-0002](https://doi.org/10.18777/ieashc-task60-2020-0002).  
 
-- Kramer, Korbinian; Lämmle, Manuel et al. (2020): Satus Quo of PVT Characterization. SHC Task 60 - Reprt B1. In: _IEA SHC Task 60 | PVT Systems_. [https://doi.org/10.18777/ieashc-task60-2020-0004](https://doi.org/10.18777/ieashc-task60-2020-0004)
+- Kramer, Korbinian; Lämmle, Manuel et al. (2020): Satus Quo of PVT Characterization. SHC Task 60 - Reprt B1. In: IEA SHC Task 60,  PVT Systems. [https://doi.org/10.18777/ieashc-task60-2020-0004](https://doi.org/10.18777/ieashc-task60-2020-0004)
 
-- Zenhäusern, Daniel; Gagliano, Antonio; Jonas, Danny; Marco, Guiseppe; Hadorn, Jean-Christophe; Lämmle, Manuel; Herrando, María (2020): Key Performance Indicators for PVT Systems. SHC Task 60, Report D1. In: IEA SHC Task 60 | PVT Systems. DOI: 10.18777/ieashc-task60-2020-0007. 
+- Zenhäusern, Daniel; Gagliano, Antonio; Jonas, Danny; Marco, Guiseppe; Hadorn, Jean-Christophe; Lämmle, Manuel; Herrando, María (2020): Key Performance Indicators for PVT Systems. SHC Task 60, Report D1. In: IEA SHC Task 60, PVT Systems. DOI: 10.18777/ieashc-task60-2020-0007. 
 
 - Hadorn, Jean-Christophe; Lämmle, Manuel; Kramer, Korbinian; Munz, Gunther; Herrando, María; Brottier, Laetitia (2020): Design Guidelines for PVT Collectors. SHC Task 60/Report B2/July 2020. In: IEA SHC Task 60. DOI: 10.18777/ieashc-task60-2020-0003. 
 
@@ -140,7 +142,8 @@ Last update: 15.04.2025
 
 - Lämmle, Manuel (2012): Assessment of the global potential for CO2 mitigation of carbon capture and storage (CCS) until 2050. Diplomarbeit, Fraunhofer ISI, Karlsruhe Institut für Technologie (KIT). 
 
- ## Presentations (selection)
+
+## Presentations (selection)
 
 - Integration von Abwärme in kalte Nahwärmenetze. 45. Offenburger Wirtschaftsforum. 17.07.2024
 
