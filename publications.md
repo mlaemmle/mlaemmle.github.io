@@ -1,6 +1,7 @@
-
 # Publication list
-Last update: 02.01.2025
+
+Last update: 15.04.2025
+
 
 ## Profile
 
@@ -11,6 +12,7 @@ Last update: 02.01.2025
 - Researchgate: [https://www.researchgate.net/profile/Manuel-Laemmle](https://www.researchgate.net/profile/Manuel-Laemmle)
 
 - [OPUS HS Offenburg](https://opus.hs-offenburg.de/solrsearch/index/search/searchtype/authorsearch/author/L%C3%A4mmle%2C+Manuel)
+
 
 ## Peer reviewed articles as main author
 
@@ -25,6 +27,7 @@ Last update: 02.01.2025
 - Lämmle, Manuel; Kroyer, Thomas; Fortuin, Stefan; Wiese, Martin; Hermann, Michael (2016): Development and modelling of highly-efficient PVT collectors with low‑emissivity coatings. Solar Energy (130), pp. 161–173. [https://doi.org/10.1016/j.solener.2016.02.007](https://doi.org/10.1016/j.solener.2016.02.007) 
 
 - Lämmle, Manuel; Thoma, Christoph; Hermann, Michael (2016): A PVT Collector Concept with Variable Film Insulation and Low‑emissivity Coating. Energy Procedia 91, pp. 72–77. [https://doi.org/10.1016/j.egypro.2016.06.174](https://doi.org/10.1016/j.egypro.2016.06.174) 
+
 
 ## Peer reviewed articles as co-author
 
@@ -41,6 +44,7 @@ Last update: 02.01.2025
 - Vollmer, Raphael; Lämmle, Manuel; Hess, Stefan; Henning, Hans-Martin (2023): Optimization of Energetic Refurbishment Roadmaps for Multi-Family Buildings Utilizing Heat Pumps. Energy and buildings (280). [https://doi.org/10.1016/j.enbuild.2022.112729](https://doi.org/10.1016/j.enbuild.2022.112729). 
 
 - Jonas, Danny; Lämmle, Manuel; Theis, Danjana; Schneider, Sebastian; Frey, Georg (2019): Performance modeling of PVT collectors: implementation, validation and parameter identification approach using TRNSYS.Solar Energy (193), S. 51–64. [https://doi.org/10.1016/j.solener.2019.09.047](https://doi.org/10.1016/j.solener.2019.09.047)
+
 
 ## Conference articles with peer-review
 
@@ -98,7 +102,9 @@ Last update: 02.01.2025
 
 ## Other publications: Project reports, articles
 
-- Kropp, M., Lämmle, M., Schauer, C., Reiter, F., 2023. Niedrigere Trinkwarmwasser-Systemtemperaturen bringen Wärmepumpen in die Breite. HLH : Lüftung, Klima, Heizung, Sanitär, Gebäudetechnik 74, 32–37. [https://doi.org/10.37544/1436-5103-2023-09-32](https://doi.org/10.37544/1436-5103-2023-09-32)
+- Lämmle, M., Tomás, L., 2025. Datenbasierte Auswertung der technischen Kenndaten von zertifizierten Wärmepumpen. HLH 76, 26–31. [https://doi.org/10.37544/1436-5103-2025-04-26](https://doi.org/10.37544/1436-5103-2025-04-26)
+
+- Kropp, M., Lämmle, M., Schauer, C., Reiter, F., 2023. Niedrigere Trinkwarmwasser-Systemtemperaturen bringen Wärmepumpen in die Breite. HLH: Lüftung, Klima, Heizung, Sanitär, Gebäudetechnik 74, 32–37. [https://doi.org/10.37544/1436-5103-2023-09-32](https://doi.org/10.37544/1436-5103-2023-09-32)
 
 - Sawant, P.A., Pfafferott, J., Bürger, A., Bongs, C., Braasch, C., Glatz, S., Huber, H., Koch, Manuel, Koch, Matthias, Lämmle, M., 2023. Aktuelle Herausforderungen für den Betrieb von dezentralen Energieverbundsystemen. BWK: Energie 75, 53–55.
 
