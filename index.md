@@ -16,9 +16,11 @@
 ## Forschungsprojekte
 [Übersicht Forschungsprojekte](research)
 
-- SQ-DurlachII: Demonstration von skalierbaren Lösungen und Entwicklung von digitalen Methoden für Planung, Umsetzung und Betrieb von integrierten Energiekonzepten mit Großwärmepumpen in Bestandsquartieren.
+- **SQ-DurlachII**: Demonstration von skalierbaren Lösungen und Entwicklung von digitalen Methoden für Planung, Umsetzung und Betrieb von integrierten Energiekonzepten mit Großwärmepumpen in Bestandsquartieren.
 
-- TRAIL: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
+- **GraphEET**: Graphen und KI-Verfahren für das Technische Monitoring von Energieeffizienten Gebäuden
+
+- **TRAIL**: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
 
 
 ## Veröffentlichungen

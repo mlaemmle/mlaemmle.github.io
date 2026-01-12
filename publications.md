@@ -1,6 +1,6 @@
 # Publication list
 
-Last update: 15.04.2025
+Last update: 12.01.2026
 
 
 ## Profile
@@ -98,8 +98,7 @@ Last update: 15.04.2025
 
 - Herkel, Sebastian; Lämmle, Manuel; Munz, Gunther; Bacher, Jean-Philippe; Boesiger, Martin; Couty, Philippe et al. (2021): Competition & Living Lab Platform (Annex 74) Science & Technology (Subtask A) Focus Report 2: Topical Paper. Unter Mitarbeit von Bergische Universität Wuppertal. [https://doi.org/10.25926/3f99-xy74](https://doi.org/10.25926/3f99-xy74).
 
-- Lämmle, Manuel (2018): Thermal management of PVT collectors - development and modelling of highly efficient PVT collectors with low-emissivity coatings and overheating protection.PhD thesis, Fraunhofer ISE, INATECH Albert-Ludwigs-Universität Freiburg. [https://doi.org/10.6094/UNIFR/16446](https://doi.org/10.6094/UNIFR/16446)
-  Ebenfalls erschienen im Fraunhofer Verlag, ISBN 978-3-8396-1436-5. 
+- Lämmle, Manuel (2018): Thermal management of PVT collectors - development and modelling of highly efficient PVT collectors with low-emissivity coatings and overheating protection.PhD thesis, Fraunhofer ISE, INATECH Albert-Ludwigs-Universität Freiburg. [https://doi.org/10.6094/UNIFR/16446](https://doi.org/10.6094/UNIFR/16446). Ebenfalls erschienen im Fraunhofer Verlag, ISBN 978-3-8396-1436-5. 
 
 
 ## Other publications: Project reports, articles
