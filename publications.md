@@ -1,17 +1,17 @@
 # Publication list
 
-Last update: 12.01.2026
+Last update: 30.01.2026
 
 
 ## Profile
 
-- Orcid ID: [https://orcid.org/0000-0001-5931-7975](https://orcid.org/0000-0001-5931-7975)
+- Orcid ID: [0000-0001-5931-7975](https://orcid.org/0000-0001-5931-7975)
 
 - Google Scholar: [https://scholar.google.com/citations?user=4mbr7F8AAAAJ](https://scholar.google.com/citations?user=4mbr7F8AAAAJ)
 
-- Researchgate: [https://www.researchgate.net/profile/Manuel-Laemmle](https://www.researchgate.net/profile/Manuel-Laemmle)
+- Researchgate: [Manuel-Laemmle](https://www.researchgate.net/profile/Manuel-Laemmle)
 
-- [OPUS HS Offenburg](https://opus.hs-offenburg.de/solrsearch/index/search/searchtype/authorsearch/author/L%C3%A4mmle%2C+Manuel)
+- OPUS HS Offenburg: [https://opus.hs-offenburg.de](https://opus.hs-offenburg.de/solrsearch/index/search/searchtype/authorsearch/author/L%C3%A4mmle%2C+Manuel)
 
 
 ## Peer reviewed articles as main author
@@ -96,12 +96,14 @@ Last update: 12.01.2026
 
 ## Books and Chapters
 
+- Lämmle, M., 2026. Technological Dimensions for Sustainable Business Development: An Integrated Framework Covering Energy, Materials, Circularity, and Digitalization. In: Verkuil, A.H., Milow, U., Hinz, A., Al-Kilani, M. (Eds.), Innovating Business and Education for Sustainable Development. Springer Nature Switzerland, Cham, pp. 39–59. [https://doi.org/10.1007/978-3-032-10065-8_3](https://doi.org/10.1007/978-3-032-10065-8_3).
+
 - Herkel, Sebastian; Lämmle, Manuel; Munz, Gunther; Bacher, Jean-Philippe; Boesiger, Martin; Couty, Philippe et al. (2021): Competition & Living Lab Platform (Annex 74) Science & Technology (Subtask A) Focus Report 2: Topical Paper. Unter Mitarbeit von Bergische Universität Wuppertal. [https://doi.org/10.25926/3f99-xy74](https://doi.org/10.25926/3f99-xy74).
 
 - Lämmle, Manuel (2018): Thermal management of PVT collectors - development and modelling of highly efficient PVT collectors with low-emissivity coatings and overheating protection.PhD thesis, Fraunhofer ISE, INATECH Albert-Ludwigs-Universität Freiburg. [https://doi.org/10.6094/UNIFR/16446](https://doi.org/10.6094/UNIFR/16446). Ebenfalls erschienen im Fraunhofer Verlag, ISBN 978-3-8396-1436-5. 
 
 
-## Other publications: Project reports, articles
+## Other publications, project reports and articles
 
 - Lämmle, M., Tomás, L., 2025. Datenbasierte Auswertung der technischen Kenndaten von zertifizierten Wärmepumpen. HLH 76, 26–31. [https://doi.org/10.37544/1436-5103-2025-04-26](https://doi.org/10.37544/1436-5103-2025-04-26)
 
