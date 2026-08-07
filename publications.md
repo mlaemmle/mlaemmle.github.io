@@ -48,9 +48,13 @@ Last update: 30.01.2026
 
 ## Conference articles with peer-review
 
-- Lämmle, Manuel; Allen, Amy; Pless, Shanti; Henze, Gregor (2022): Valuation of Novel Waste Heat Sources in Fifth Generation District Heating and Cooling (5GDHC) netwoks and a Path Towards Adoption. In: 2022 ACEEE Summer Study on Energy Efficiency in Pacific Grove (NREL/CP-5500-83352). [https://www.nrel.gov/docs/fy22osti/83352.pdf](https://www.nrel.gov/docs/fy22osti/83352.pdf)
-  
+- Tomás, L., Thennadan, A.R., Kasturi, P., Kropp, M., Lämmle, M., 2026. Validation of a mosaik-based Python simulation framework for smart district energy plants with a large heat pump share. In: Proceedings of 15th IEA Heat Pump Conference.
+
+- Fazaa, N., Schygalla, A., Pak, E., Schmid, E., Faller, F., Fugmann, H., Madani, H., Lämmle, M., 2026. Data-Driven Techniques for the Prediction of Refrigerant Charge in Heat Pumps through Machine Learning Soft Sensors. In: Proceedings of 15th IEA Heat Pump Conference.
+
 - Kropp, M., Metz, J., Lämmle, M., 2023. Energetic performance of a smart neighborhood of existing multifamily buildings with heat pumps, PV and CHP focusing on energy balance and CO2 emissions. Presented at the Journal of Physics: Conference Series, IOP Publishing, pp. 1–6. [https://doi.org/10.1088/1742-6596/2600/3/032001](https://doi.org/10.1088/1742-6596/2600/3/032001)
+
+- Lämmle, Manuel; Allen, Amy; Pless, Shanti; Henze, Gregor (2022): Valuation of Novel Waste Heat Sources in Fifth Generation District Heating and Cooling (5GDHC) netwoks and a Path Towards Adoption. In: 2022 ACEEE Summer Study on Energy Efficiency in Pacific Grove (NREL/CP-5500-83352). [https://www.nrel.gov/docs/fy22osti/83352.pdf](https://www.nrel.gov/docs/fy22osti/83352.pdf)
 
 - Lämmle, Manuel; Kropp, Michael; Metz, Jakob; Herkel, Sebastian (2022): Simulation and Measurement results of a smart district with connected heat pumps, PV and CHP as a model project for decarbonizing multifamily buildings. In: Proceedings of BauSIM 2022 in Weimar. 
 
@@ -96,7 +100,7 @@ Last update: 30.01.2026
 
 ## Books and Chapters
 
-- Lämmle, M., 2026. Technological Dimensions for Sustainable Business Development: An Integrated Framework Covering Energy, Materials, Circularity, and Digitalization. In: Verkuil, A.H., Milow, U., Hinz, A., Al-Kilani, M. (Eds.), Innovating Business and Education for Sustainable Development. Springer Nature Switzerland, Cham, pp. 39–59. [https://doi.org/10.1007/978-3-032-10065-8_3](https://doi.org/10.1007/978-3-032-10065-8_3).
+- Lämmle, Manuel, 2026. Technological Dimensions for Sustainable Business Development: An Integrated Framework Covering Energy, Materials, Circularity, and Digitalization. In: Verkuil, A.H., Milow, U., Hinz, A., Al-Kilani, M. (Eds.), Innovating Business and Education for Sustainable Development. Springer Nature Switzerland, Cham, pp. 39–59. [https://doi.org/10.1007/978-3-032-10065-8_3](https://doi.org/10.1007/978-3-032-10065-8_3).
 
 - Herkel, Sebastian; Lämmle, Manuel; Munz, Gunther; Bacher, Jean-Philippe; Boesiger, Martin; Couty, Philippe et al. (2021): Competition & Living Lab Platform (Annex 74) Science & Technology (Subtask A) Focus Report 2: Topical Paper. Unter Mitarbeit von Bergische Universität Wuppertal. [https://doi.org/10.25926/3f99-xy74](https://doi.org/10.25926/3f99-xy74).
 
