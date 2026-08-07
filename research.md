@@ -1,11 +1,18 @@
-# Forschungsportfolio
+# Laufende Forschungsprojekte
 
-## Themenschwerpunkt: Smarte und energieeffiziente Energiekonzepte für Gebäude und Quartiere
+- **SQ-DurlachII**: SQ-Durlach II demonstriert an zwei Standorten skalierbare Wärmepumpen-Energiekonzepte (10–100 kWth) in Bestandsquartieren und entwickelt digitale Methoden für deren Planung, Umsetzung und Betrieb. Durch wissenschaftliches Monitoring werden Anlagentechnik und vernetzter Betrieb optimiert, ergänzt durch innovative Komponenten wie PVT-Wärmepumpen-Kombinationen und WP-Energiezentralen für Nahwärmenetze. Ziel ist ein reduzierter Fachkräfteeinsatz im Betrieb solcher Quartierskonzepte, um die Wärmewende trotz Fachkräftemangels und volatiler Rahmenbedingungen zu beschleunigen.
+  
+- **GraphEET**: GraphEET verbindet KI-Verfahren mit Wissensgraphen und Ontologien, um Technisches Monitoring in der Gebäudeautomation zu automatisieren. Fraunhofer ISE und die Hochschule Offenburg entwickeln gemeinsam mit Industriepartnern eine semantische Modellierung von Anlagen, Sensoren und Anlagentopologien auf Basis der TBSys-Ontologie (Standard 223P, Brick Schema), die Datenpunkte aus der Gebäudeautomation automatisch erkennt und strukturiert. Dieser Wissensgraph bildet die Grundlage für standardisierte Prüf- und Diagnoseprozesse im Energiemanagement, die künftig automatisiert auf unterschiedliche Anlagentopologien angewendet und an realen Anlagen demonstriert werden.
 
-### EnEff:Stadt: SQ-Durlach II
-- FKZ 03EN3095D
-- Demonstration von skalierbaren Lösungen und Entwicklung von digitalen Methoden für Planung, Umsetzung und  Betrieb von integrierten Energiekonzepten mit Großwärmepumpen in  Bestandsquartieren 
-- Teilvorhaben: Entwicklung einer smarten WP-Heizzentrale, Monitoring Stutensee
+- **TRAIL**: Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
+
+- **KoRes**: Kommunale Resilienzpfade im Einklang mit der nationalen Energiewende.
+Im Projekt KoRes werden Methoden für die Bewertung kommunaler Energiesysteme hinsichtlich Resilienz und Klimaneutralität entwickelt. Im Kern wird dazu das nationale Energiesystemmodell MyPyPSA-Ger angepasst, sodass damit Kritis, Quartiere, Städte und Kommunen hinsichtlich ihrer energetischen Resilienz in Krisenszenarien bewertet werden. Ziel sind belastbare Transformationspfade und konkrete Handlungsempfehlungen, die Kommunen bei der Umsetzung einer sicheren, klimaneutralen Energieversorgung im Rahmen der Energiewende unterstützen.
+
+
+
+# Abgeschlossene Forschungsprojekte (Fraunhofer ISE, INATECH)
+
 
 ### EnEff:Stadt - KA-Durlach: Smartes Quartier Karlsruhe-Durlach 
 - FKZ 03ET1590B
