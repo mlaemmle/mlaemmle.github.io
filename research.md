@@ -11,13 +11,11 @@
 ### TRAIL
 - Einrichtung des trinationalen Masterstudiengang Sustainable Business Development. Der einzigartige Studiengang mit dem Fokus auf Nachhaltige Unternehmensentwicklung wird von der Hochschule für Wirtschaft FHNW (Schweiz), der Hochschule Offenburg (Deutschland) und der EM Strasbourg Business School, Université de Strasbourg (Frankreich) gemeinsam aufgebaut, koordiniert und implementiert.
 - Förderung durch Interreg
-- **KoRes**: Kommunale Resilienzpfade im Einklang mit der nationalen Energiewende.
-Im Projekt KoRes werden Methoden für die Bewertung kommunaler Energiesysteme hinsichtlich Resilienz und Klimaneutralität entwickelt. Im Kern wird dazu das nationale Energiesystemmodell MyPyPSA-Ger angepasst, sodass damit Kritis, Quartiere, Städte und Kommunen hinsichtlich ihrer energetischen Resilienz in Krisenszenarien bewertet werden. Ziel sind belastbare Transformationspfade und konkrete Handlungsempfehlungen, die Kommunen bei der Umsetzung einer sicheren, klimaneutralen Energieversorgung im Rahmen der Energiewende unterstützen.
-
-
+  
+### KoRes: "Kommunale Resilienzpfade im Einklang mit der nationalen Energiewende"
+- Im Projekt KoRes werden Methoden für die Bewertung kommunaler Energiesysteme hinsichtlich Resilienz und Klimaneutralität entwickelt. Im Kern wird dazu das nationale Energiesystemmodell MyPyPSA-Ger angepasst, sodass damit Kritis, Quartiere, Städte und Kommunen hinsichtlich ihrer energetischen Resilienz in Krisenszenarien bewertet werden. Ziel sind belastbare Transformationspfade und konkrete Handlungsempfehlungen, die Kommunen bei der Umsetzung einer sicheren, klimaneutralen Energieversorgung im Rahmen der Energiewende unterstützen.
 
 # Abgeschlossene Forschungsprojekte (Fraunhofer ISE, INATECH)
-
 
 ### EnEff:Stadt - KA-Durlach: Smartes Quartier Karlsruhe-Durlach 
 - FKZ 03ET1590B
