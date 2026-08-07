@@ -1,17 +1,16 @@
-# Akademischer und Beruflicher Werdegang
+# Akademischer Werdegang
 
 ### Professor für Energieinformatik und Gebäudeenergietechnik an der Hochschule Offenburg 	   
 - Zeitraum: seit 2023
-- W2-Professur mit 18 SWS Deputat
-- Leitung der Forschungsgruppe Energieeffiziente Gebäude E2G gemeinsam mit Prof. Jens Pfafferot 
+- Leitung der Forschungsgruppe [Energieeffiziente Gebäudetechnik E2G](https://www.hs-offenburg.de/forschung/institute/ines/energieeffiziente-gebaeudetechnik) gemeinsam mit Prof. Jens Pfafferot 
 - Forschung mit dem Schwerpunkt "Smart Buildings and Analytics"
 - Studiendekan des trinationalen Studiengangs „Sustainable Business Development”
-- Lehre mit Schwerpunkt Energietechnik, Wärmetechnik und digitalen Methoden in den Studiengängen Nachhaltige Energiesysteme (B.Eng.), Renewable Energy and Data Engineering (M.Sc.), Sustainable Business Development (M.Sc.) und Maschinenbau (B.Eng.)	
+- Lehre mit Schwerpunkt Energietechnik, Gebäudetechnik, Data Science und Machine Learning in den Studiengängen Nachhaltige Energiesysteme (B.Eng.), Renewable Energy and Data Engineering (M.Sc.), Sustainable Business Development (M.Sc.) und Maschinenbau (B.Eng.)	
 
 ### Projektleiter und Wissenschaftlicher Mitarbeiter am Fraunhofer-Institut für Solare Energiesysteme ISE, Freiburg
 - Zeitraum: 2013 - 2023
 - Projektleitung in angewandten Forschungsprojekten mit den fachlichen Schwerpunkten:
-	- Energieeffiziente und smarte Energietchnik für Gebäude und Quartiere
+	- Energieeffiziente und smarte Energietechnik für Gebäude und Quartiere
 	- Thermische und elektrische Nutzung von Solarenergie
 - Konzeption, Simulation, Umsetzung, Evaluierung und Optimierung von vernetzten und komplexen Energiekonzepten mit Sektorenkopplung (u.a. Photovoltaik, Wärmepumpe, Blockheizkraftwerk, PVT-Kollektoren, Solarthermie, Nahwärmenetze, Strom- und Wärmespeicher)
 - Integration von Wärmepumpen und lokale Energiequellen in Bestandsgebäude durch Temperaturabsenkung des Heizsystems durch selektiven Heizkörpertausch, effiziente Trinkwassererwärmung und ganzheitliche Optimierung von Sanierungsfahrplänen (LowEx-Bestand Analyse)
@@ -21,17 +20,14 @@
 
 ### Gruppenleiter „Nachhaltige Gebäudeenergietechnik" am INATECH, Institut für Nachhaltige Technische Systeme, Universität Freiburg	   
 - Zeitraum: 2022 - 2023
-- Leitung der Gruppe „Nachhaltige Gebäudeenergietechnik“der Professur Hans-Martin Henning „Solare Energiesysteme“ mit aktuell 5 Mitarbeitenden
-- Koordination und Strategieentwicklung von Forschung und Lehre der Professur
-- Finanzverantwortung und Einwerbung von Drittmittel (Energieforschungsprogramm BMWK, BMBK, Stiftungsprojekt)
-- Strategische Ausrichtung der Arbeitsgruppe als gemeinsame Forschungsgruppe von Uni Freiburg und Fraunhofer ISE
-- Durchführung von insgesamt 7 Lehrveranstaltungen  an der Unviersität Freiburg 
+- Leitung der Gruppe „Nachhaltige Gebäudeenergietechnik“der Professur Hans-Martin Henning „Solare Energiesysteme“ mit 5 Mitarbeitenden
+- Forschung und Einwerbung von Drittmittel 
+- Durchführung von insgesamt 7 Lehrveranstaltungen  an der Universität Freiburg 
 
 ### Forschungsstipendiat an der University of Colorado in Boulder, National Renewable Energy Laboratory NREL, Boulder
 - Zeitraum: 2021
 - Datenanalyse und statistische Modellierung von gemessenen Zeitreihen aus Abwärmeprozessen zur Integration in kalte Nahwärmenetze
-- Entwicklung eines Modellansatzes auf Basis gefitteter saisonaler und täglicher Lastprofile mittels Cyclic Cubic Splines, einem Verfügbarkeitsmodell und ein ARIMA-Ansatz für graues Rauschen.
-- Finanzierung über ein Post-Doc Auslandsstipendium des Deutschen Akademischen Auslandsdiensts (DAAD)
+- Post-Doc Auslandsstipendium des Deutschen Akademischen Auslandsdiensts (DAAD)
 
 ### Doktorand am Fraunhofer ISE, Albert-Ludwigs-Universität Freiburg
 - Zeitraum : 2013 - 2018
