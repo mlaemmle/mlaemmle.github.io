@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PV-Ertragsprognose (pvlib)</title>
+<title>pv.sim – Ertragssimulation von Photovoltaik-Systemen</title>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
@@ -176,14 +176,14 @@
 <body>
 
 <div id="overlay"><div class="box">
-  <h2>PV-Ertragsprognose wird vorbereitet …</h2>
+  <h2>pv.sim wird vorbereitet …</h2>
   <p id="ov-msg">Python-Laufzeit (Pyodide) wird geladen</p>
   <div class="bar"><i id="ov-bar"></i></div>
   <p class="hint" style="margin-top:12px;margin-bottom:0" id="ov-err"></p>
 </div></div>
 
 <header class="top">
-  <h1>PV-Ertragsprognose</h1>
+  <h1>pv.sim <span style="font-weight:400;color:var(--ink-3);font-size:.6em;margin-left:6px">Ertragssimulation von Photovoltaik-Systemen</span></h1>
 </header>
 
 <div class="layout">
@@ -371,7 +371,7 @@
       <h3>5 · Reflexionsverluste (IAM)</h3>
       <p>Bei flachem Einfall wird ein Teil der Strahlung an der Glasoberfläche reflektiert. Der <i>Incidence Angle Modifier</i> (IAM) beschreibt den durchgelassenen Anteil in Abhängigkeit vom Einfallswinkel (Fresnel-Reflexion mit Brechungsindex n = 1,526 und Absorption im Glas, K = 4 m<sup>−1</sup>, L = 2 mm). Für diffuse und bodenreflektierte Strahlung gilt ein über alle Einfallswinkel gemittelter IAM (Marion-Verfahren). Die effektive Einstrahlung ist</p>
       <div class="formula">\[ G_\mathrm{eff}=G_\mathrm{dir}\cdot\mathrm{IAM}(\theta)+G_\mathrm{dif}\cdot\mathrm{IAM}_\mathrm{dif}+G_\mathrm{refl}\cdot\mathrm{IAM}_\mathrm{refl} \]</div>
-      <p>Typisch ergeben sich Jahresverluste von wenigen Prozent. Der Excel-Rechner berücksichtigt sie nicht; in dieser Seite lassen sie sich unter „Erweiterte Einstellungen“ abschalten.</p>
+      <p>Typisch ergeben sich Jahresverluste von wenigen Prozent. Der Excel-Tool berücksichtigt sie nicht; in dieser Seite lassen sie sich unter „Erweiterte Einstellungen“ abschalten.</p>
 
       <h3>6 · Zelltemperatur</h3>
       <p>Der Wirkungsgrad kristalliner Module sinkt mit steigender Zelltemperatur. Die Zelle ist im Betrieb deutlich wärmer als die Luft; wie viel wärmer, hängt von Einstrahlung, Wind und Montageart (Hinterlüftung) ab.</p>
@@ -421,7 +421,7 @@
         <li>Ein Wetterjahr ist nicht das Wetter des nächsten Jahres: Der Jahresertrag schwankt real um etwa ±5–10 %. Die Ergebnisse sind Prognosen, keine Garantie.</li>
       </ul>
 
-      <h3>Unterschiede zum Excel-Rechner</h3>
+      <h3>Unterschiede zum Excel-Tool</h3>
       <p>Mit identischen Eingaben (Excel-Wetterdaten, Modus „Excel-kompatibel“) zeigt sich:</p>
       <ul>
         <li>Sonnenhöhe und Einfallswinkelformel stimmen überein (Abweichung der Sonnenhöhe &lt; 0,5°).</li>
@@ -491,7 +491,11 @@
 </main>
 </div>
 
-<footer>Rechenkern: pvlib (Sonnenstand NREL-SPA, Perez-Modell, SAPM, PVWatts). Wetterdaten: DWD-Testreferenzjahre (TRY) bzw. Open-Meteo/ERA5. Ergebnisse sind Prognosen, keine Garantie.<br><span style="display:inline-block;margin-top:8px">Credits: Prof. Dr. Manuel Lämmle auf Vorlage des Excel-Rechners von Prof. Dr. Henrik te Heesen, Umwelt-Campus Birkenfeld, Institut für Betriebs- und Technologiemanagement (IBT). Erstellt für das Modul „Erneuerbare Energie“ im Studiengang Sustainable Business Development.</span></footer>
+<footer>
+  <b>pv.sim</b> – Ertragssimulation von Photovoltaik-Systemen. Rechenkern: pvlib (Sonnenstand NREL-SPA, Perez-Modell, SAPM, PVWatts). Wetterdaten: DWD-Testreferenzjahre (TRY) bzw. Open-Meteo/ERA5. Ergebnisse sind Prognosen, keine Garantie.
+  <div style="margin-top:8px"><b>Credits:</b> pv.sim: Prof. Dr. Manuel Lämmle, Hochschule Offenburg. Erstellt für das Modul „Erneuerbare Energie“ im Studiengang Sustainable Business Development.</div>
+  <div style="margin-top:4px"><b>Vorlage (Excel-Tool):</b> Borger, Jonas; Hermesdorf, Felix; Trester, Samuel; te Heesen, Henrik (2026). Photovoltaik-Ertragssimulation (Version vom 4. August 2026) [Computerprogramm]. Hochschule Trier. Verfügbar unter: <a href="https://umwelt-campus.de/energietools" target="_blank" rel="noopener" style="color:inherit">umwelt-campus.de/energietools</a> (Zugriff am: 4. November 2026).</div>
+</footer>
 
 <!-- ========================= PYTHON-MODELL (pvlib) ========================= -->
 <script type="text/x-python" id="pv-model">
@@ -1035,7 +1039,7 @@ async function loadSource() {
     const txt = await getCsv(s);
     py.globals.get('load_try_csv')(txt, s.year, s.utc_offset, s.name);
     wxLoaded = 'try:' + s.name; scheduleRun(0);
-  } catch (e) { fail(e, 'Die Wetterdatei konnte nicht geladen werden. Liegt der Ordner „data“ neben der HTML-Datei? Alternativ die Datei pvlib_simulator_standalone.html verwenden.'); }
+  } catch (e) { fail(e, 'Die Wetterdatei konnte nicht geladen werden. Liegt der Ordner „data“ neben der HTML-Datei? Alternativ die Datei pv.sim_standalone.html verwenden.'); }
 }
 async function fetchOpenMeteo() {
   const lat = num('lat'), lon = num('lon'), year = $('#wx-year').value;
@@ -1234,7 +1238,7 @@ function setHourRange(L) {
 /* ---------------- Downloads ---------------- */
 function baseName() {
   const k = res.kpi, src = $('#src').value === 'custom' ? `lat${num('lat').toFixed(2)}_lon${num('lon').toFixed(2)}` : $('#src').value;
-  return `pv_${src}_${Math.round(k.power_kwp * 100) / 100}kWp_${Math.round(num('tilt'))}grad_az${Math.round(num('az'))}`;
+  return `pvsim_${src}_${Math.round(k.power_kwp * 100) / 100}kWp_${Math.round(num('tilt'))}grad_az${Math.round(num('az'))}`;
 }
 function downloadCsv(kind) {
   const names = { hourly: 'stundenwerte', daily: 'tageswerte', monthly: 'monatswerte' };
@@ -1275,7 +1279,7 @@ async function init() {
     const [ , meta] = await Promise.all([initPython(), getStandorte()]);
     STANDORTE = meta;
   } catch (e) {
-    $('#ov-err').textContent = 'Fehler beim Start: ' + e.message + ' – Liegt der Ordner „data“ neben der HTML-Datei? Sonst bitte pvlib_simulator_standalone.html verwenden. (Python/pvlib werden aus dem Internet geladen.)';
+    $('#ov-err').textContent = 'Fehler beim Start: ' + e.message + ' – Liegt der Ordner „data“ neben der HTML-Datei? Sonst bitte pv.sim_standalone.html verwenden. (Python/pvlib werden aus dem Internet geladen.)';
     console.error(e); return;
   }
   const sel = $('#src'); const g1 = document.createElement('optgroup'); g1.label = 'DWD-Testreferenzjahr (TRY)';

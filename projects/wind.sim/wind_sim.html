@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wind.sim – Ertragssimulation von Windenergieanlagen</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+
+  :root {
+    color-scheme: light;
+    --bg: #f5f5f4;
+    --surface: #ffffff;
+    --ink: #1a1a1a;
+    --ink-2: #52514e;
+    --ink-3: #898781;
+    --line: #e1e0d9;
+    --line-2: #c3c2b7;
+    --accent: #1a1a1a;
+    --blue: #2a78d6;
+    --blue-dark: #1c5cab;
+    --blue-soft: #e8f1fc;
+    --orange: #eb6834;
+    --aqua: #1baf7a;
+    --yellow: #eda100;
+    --danger: #d03b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.45;
+  }
+  header.top {
+    max-width: 1680px; margin: 0 auto; padding: 22px 24px 8px;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; justify-content: space-between;
+  }
+  header.top h1 { font-size: 20px; font-weight: 600; }
+  header.top p { font-size: 13px; color: var(--ink-3); }
+  .layout {
+    max-width: 1680px; margin: 0 auto; padding: 12px 24px 40px;
+    display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 18px; align-items: start;
+  }
+  @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; padding: 12px 16px 32px; } header.top { padding: 18px 16px 4px; } }
+  aside { display: flex; flex-direction: column; gap: 14px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px;
+  }
+  .card h2 { font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label, .lbl { font-size: 12px; color: var(--ink-2); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  input[type=number], input[type=text], select {
+    width: 100%; font: inherit; color: var(--ink); background: #fafafa; border: 1px solid #d6d5cd;
+    border-radius: 8px; padding: 7px 9px; min-height: 34px;
+  }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+  input.bad { border-color: var(--danger); background: #fdf1f1; }
+  .unit-wrap { position: relative; }
+  .unit-wrap input { padding-right: 46px; }
+  .unit-wrap.s input { padding-right: 26px; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+  .unit-wrap span { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--ink-3); pointer-events: none; }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: #efeeea; border-radius: 9px; padding: 3px; gap: 3px; margin-bottom: 12px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { text-align: center; font-size: 12.5px; padding: 6px 8px; border-radius: 7px; cursor: pointer; color: var(--ink-2); }
+  .seg input:checked + label { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); font-weight: 600; }
+  .seg input:focus-visible + label { outline: 2px solid var(--blue); }
+  .hint { font-size: 12px; color: var(--ink-3); }
+  .hint.warn { color: #b3541f; }
+  .hint.err { color: var(--danger); }
+  .calc { font-size: 12.5px; color: var(--ink-2); background: var(--blue-soft); border-radius: 8px; padding: 6px 10px; margin-top: 2px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip, .btn {
+    font: inherit; font-size: 12px; padding: 4px 11px; border-radius: 999px; border: 1px solid #d6d5cd;
+    background: #fafafa; color: #333; cursor: pointer;
+  }
+  .chip:hover, .btn:hover { background: #f0efec; }
+  .chip.on, .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn { font-size: 13px; padding: 7px 14px; border-radius: 9px; }
+  .btn.primary:hover { background: #333; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  input[type=range] { width: 100%; accent-color: var(--blue); }
+  details.card summary { cursor: pointer; font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-2); list-style: none; display: flex; justify-content: space-between; }
+  details.card summary::after { content: "▾"; color: var(--ink-3); }
+  details.card[open] summary::after { content: "▴"; }
+  details.card[open] summary { margin-bottom: 12px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+  .check input { margin-top: 3px; accent-color: var(--blue); }
+  .geo-res { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .geo-res button { text-align: left; font: inherit; font-size: 12.5px; padding: 6px 9px; border: 1px solid var(--line); background: #fafafa; border-radius: 8px; cursor: pointer; }
+  .geo-res button:hover { background: var(--blue-soft); }
+
+  /* Modul-Skizze */
+  .sketch { display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; align-items: end; margin-bottom: 8px; }
+  .sketch figure { background: #fafaf8; border: 1px solid var(--line); border-radius: 10px; padding: 6px 4px 4px; }
+  .sketch figcaption { font-size: 12px; color: var(--ink-2); text-align: center; padding: 2px 0 4px; }
+  .sketch figcaption b { color: var(--ink); font-weight: 600; }
+  .sketch svg { width: 100%; height: auto; display: block; }
+
+  /* Ergebnisse */
+  main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .status { font-size: 12.5px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; min-height: 20px; }
+  .status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--aqua); flex: none; }
+  .status.busy .dot { background: var(--yellow); animation: pulse 1s infinite; }
+  .status.err .dot { background: var(--danger); }
+  @keyframes pulse { 50% { opacity: .3; } }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 760px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .tile .k { font-size: 12px; color: var(--ink-2); }
+  .tile .v { font-size: 26px; font-weight: 600; margin-top: 2px; letter-spacing: -.01em; }
+  .tile .v small { font-size: 13px; font-weight: 400; color: var(--ink-3); margin-left: 4px; letter-spacing: 0; }
+  .tile .s { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab { font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 999px; border: 1px solid #d6d5cd; background: #fafafa; color: #333; cursor: pointer; }
+  .tab[aria-selected=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .panel { display: none; }
+  .panel.on { display: block; }
+  .panel-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .toolbar .grp { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .toolbar select, .toolbar input[type=date] { width: auto; min-width: 0; max-width: 100%; }
+  .toolbar .grp { min-width: 0; max-width: 100%; }
+  @media (max-width: 600px) { .toolbar .grp:first-child { flex: 1 1 100%; } .toolbar select { flex: 1; } .panel-card { padding: 14px 12px; } }
+  .chart { width: 100%; height: 440px; }
+  .chart.tall { height: 640px; }
+  .tablewrap { max-height: 340px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; margin-top: 12px; }
+  table.data { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  table.data th { position: sticky; top: 0; background: #f3f2ee; text-align: right; padding: 7px 10px; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+  table.data th:first-child, table.data td:first-child { text-align: left; position: sticky; left: 0; background: inherit; }
+  table.data th:first-child { background: #f3f2ee; z-index: 1; }
+  table.data td { text-align: right; padding: 5px 10px; border-bottom: 1px solid #efeee9; white-space: nowrap; background: #fff; }
+  table.data tr:hover td { background: var(--blue-soft); }
+  .kpi-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .kpi-group h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-2); margin-bottom: 6px; }
+  .kpi-group table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .kpi-group td { padding: 5px 0; border-bottom: 1px solid #efeee9; }
+  .kpi-group td.n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .kpi-group td.u { color: var(--ink-3); width: 62px; padding-left: 6px; }
+  .note { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+  .legend-note { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color: var(--ink-2); margin: 4px 0 0; }
+
+  #overlay { position: fixed; inset: 0; background: rgba(245,245,244,.92); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  #overlay .box { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 30px; width: min(420px, 90vw); }
+  #overlay h2 { font-size: 16px; margin-bottom: 4px; }
+  #overlay p { font-size: 13px; color: var(--ink-2); margin-bottom: 14px; }
+  .bar { height: 6px; background: #efeee9; border-radius: 99px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 5%; background: var(--blue); transition: width .4s; }
+  .methods li { margin: 3px 0 3px 18px; }
+  .theory { max-width: 860px; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  .theory h2 { font-size: 18px; margin-bottom: 8px; }
+  .theory h3 { font-size: 15px; margin: 24px 0 6px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .theory p { margin: 6px 0; color: var(--ink-2); }
+  .theory ul { margin: 6px 0 6px 20px; color: var(--ink-2); }
+  .theory li { margin: 5px 0; }
+  .theory table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+  .theory th, .theory td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid #efeee9; }
+  .theory th { font-weight: 600; background: #fafaf8; }
+  .theory td:first-child { font-weight: 600; white-space: nowrap; }
+  .theory .formula { margin: 8px 0; padding: 6px 12px; background: #fafaf8; border-radius: 8px; overflow-x: auto; color: var(--ink); }
+  .theory .chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; margin: 10px 0 4px; }
+  .theory .chain span { display: flex; flex-direction: column; padding: 7px 11px; border: 1px solid #d6d5cd; border-radius: 10px; background: #fafaf8; font-weight: 600; font-size: 13px; }
+  .theory .chain small { font-weight: 400; font-size: 11px; color: var(--ink-3); }
+  .theory .chain i { align-self: center; font-style: normal; color: var(--ink-3); }
+  @media (max-width: 700px) { .theory td:first-child { white-space: normal; } }
+  footer { max-width: 1680px; margin: 0 auto; padding: 0 24px 28px; font-size: 12px; color: var(--ink-3); }
+  /* wind.sim: Ergänzungen */
+  .sketch.one { grid-template-columns: 1fr; }
+  .polar-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 1100px) { .polar-grid { grid-template-columns: 1fr; } }
+  .chart.mid { height: 380px; }
+  .chart.sq { height: 400px; }
+  .subhead { font-size: 13px; font-weight: 600; margin: 4px 0 2px; }
+  .subhead + .note { margin-top: 0; margin-bottom: 6px; }
+  .block + .block { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .theory .small { font-size: 12.5px; }
+  .theory .callout { background: var(--blue-soft); border-radius: 10px; padding: 8px 12px; margin: 10px 0; color: var(--ink); font-size: 13px; }
+  footer a { color: inherit; }
+  @media (max-width: 700px) { .theory table { display: block; overflow-x: auto; max-width: 100%; } .theory .chain span { font-size: 12px; } }
+
+</style>
+</head>
+<body>
+
+<div id="overlay"><div class="box">
+  <h2>wind.sim wird vorbereitet …</h2>
+  <p id="ov-msg">Python-Laufzeit (Pyodide) wird geladen</p>
+  <div class="bar"><i id="ov-bar"></i></div>
+  <p class="hint" style="margin-top:12px;margin-bottom:0" id="ov-err"></p>
+</div></div>
+
+<header class="top">
+  <h1>wind.sim <span style="font-weight:400;color:var(--ink-3);font-size:.6em;margin-left:6px">Ertragssimulation von Windenergieanlagen</span></h1>
+</header>
+
+<div class="layout">
+<aside>
+  <!-- STANDORT -->
+  <section class="card">
+    <h2>Standort &amp; Winddaten</h2>
+    <div class="field">
+      <label for="src">Winddaten (Stundenwerte 2025)</label>
+      <select id="src"></select>
+    </div>
+    <div id="custom-box" hidden>
+      <div class="field">
+        <label for="geo-q">Ort suchen (optional)</label>
+        <div style="display:flex;gap:6px"><input type="text" id="geo-q" placeholder="z. B. Schauinsland" autocomplete="off"><button class="btn" id="geo-btn" type="button">Suchen</button></div>
+        <div class="geo-res" id="geo-res"></div>
+      </div>
+      <div class="row3">
+        <div class="field"><label for="lat">Breite</label><div class="unit-wrap s"><input type="number" id="lat" step="0.0001" min="-90" max="90" value="47.9147"><span>° N</span></div></div>
+        <div class="field"><label for="lon">Länge</label><div class="unit-wrap s"><input type="number" id="lon" step="0.0001" min="-180" max="180" value="7.9086"><span>° O</span></div></div>
+        <div class="field"><label for="wx-year">Jahr</label><select id="wx-year"></select></div>
+      </div>
+      <div class="field"><button class="btn primary" id="wx-fetch" type="button">Winddaten abrufen (ERA5)</button>
+        <span class="hint" id="wx-hint">Koordinaten eingeben bzw. Ort suchen, dann Daten abrufen.</span></div>
+    </div>
+    <div class="field" style="margin-top:10px">
+      <label for="href">Messhöhe der Winddaten</label>
+      <div class="unit-wrap s"><input type="number" id="href" class="inp" value="10" min="1" max="200" step="0.1"><span>m</span></div>
+    </div>
+    <label class="check" id="box100" hidden><input type="checkbox" id="use100"><span>ERA5-Wind in 100 m direkt verwenden (statt Umrechnung ab 10 m)</span></label>
+    <p class="hint" id="src-hint" style="margin-top:8px"></p>
+  </section>
+
+  <!-- ANLAGE -->
+  <section class="card">
+    <h2>Windenergieanlage</h2>
+    <div class="sketch one"><figure><div id="svg-turbine"></div><figcaption id="cap-turbine"></figcaption></figure></div>
+    <div class="field"><label for="type">Anlagentyp</label><select id="type" class="inp"></select><span class="hint" id="type-hint"></span></div>
+    <div class="row">
+      <div class="field"><label for="pn">Nennleistung</label><div class="unit-wrap"><input type="number" id="pn" class="inp" value="2" min="0.05" max="30" step="0.1"><span>MW</span></div></div>
+      <div class="field"><label for="rotor">Rotordurchmesser</label><div class="unit-wrap s"><input type="number" id="rotor" class="inp" value="100" min="5" max="300" step="1"><span>m</span></div></div>
+    </div>
+    <div class="field">
+      <label for="hub">Nabenhöhe</label>
+      <div style="display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:center">
+        <input type="range" id="hub-r" min="20" max="200" step="1" value="100" aria-label="Nabenhöhe Regler">
+        <div class="unit-wrap s"><input type="number" id="hub" class="inp" min="10" max="300" step="1" value="100"><span>m</span></div>
+      </div>
+      <span class="hint" id="hub-hint"></span>
+    </div>
+  </section>
+
+  <!-- ERWEITERT -->
+  <details class="card">
+    <summary>Erweiterte Einstellungen</summary>
+    <div class="subhead" style="margin-top:0">Umrechnung der Windhöhe (Windprofil)</div>
+    <div class="seg" role="radiogroup" aria-label="Windprofil">
+      <input type="radio" name="prof" id="pf-exp" value="exp" checked><label for="pf-exp">Exponentiell (Hellmann)</label>
+      <input type="radio" name="prof" id="pf-log" value="log"><label for="pf-log">Logarithmisch</label>
+    </div>
+    <div class="field"><label for="terrain">Geländetyp (Rauhigkeitslänge z₀)</label><select id="terrain"></select></div>
+    <div class="field"><label for="z0">Rauhigkeitslänge z₀</label><div class="unit-wrap s"><input type="number" id="z0" class="inp" value="0.1" min="0.0001" max="1.6" step="0.001"><span>m</span></div>
+      <span class="hint" id="prof-hint"></span></div>
+    <div class="subhead" style="margin-top:14px">Weitere Einstellungen</div>
+    <label class="check" style="margin-bottom:10px"><input type="checkbox" id="density" class="inp"><span>Luftdichte-Korrektur (Standardatmosphäre in Nabenhöhe über NN)</span></label>
+    <div class="field"><label for="loss">Sonstige Verluste (Verfügbarkeit, Nachlauf, Elektrik …)</label><div class="unit-wrap s"><input type="number" id="loss" class="inp" value="0" min="0" max="50" step="0.5"><span>%</span></div></div>
+    <p class="hint">Standard: keine Korrektur, keine Verluste. Die Luftdichte-Korrektur skaliert die Windgeschwindigkeit mit (ρ/1,225)<sup>1/3</sup> vor der Kennlinie.</p>
+  </details>
+</aside>
+
+<main>
+  <div class="status busy" id="status"><span class="dot"></span><span id="status-txt">Lade …</span></div>
+  <div class="tiles" id="tiles"></div>
+
+  <div class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-tab="year" aria-selected="true">Jahreswerte</button>
+    <button class="tab" role="tab" data-tab="month" aria-selected="false">Monatswerte</button>
+    <button class="tab" role="tab" data-tab="day" aria-selected="false">Tageswerte</button>
+    <button class="tab" role="tab" data-tab="hour" aria-selected="false">Stundenwerte</button>
+    <button class="tab" role="tab" data-tab="curve" aria-selected="false">Leistungskurve</button>
+    <button class="tab" role="tab" data-tab="dist" aria-selected="false">Verteilung</button>
+    <button class="tab" role="tab" data-tab="dir" aria-selected="false">Windrichtung</button>
+    <button class="tab" role="tab" data-tab="prof" aria-selected="false">Windprofil</button>
+    <button class="tab" role="tab" data-tab="heat" aria-selected="false">Heatmap</button>
+    <button class="tab" role="tab" data-tab="theory" aria-selected="false">Grundlagen</button>
+    <span style="flex:1"></span>
+    <button class="btn" id="dl-xlsx" type="button" disabled>⬇ Alles als Excel (.xlsx)</button>
+  </div>
+
+  <!-- Jahreswerte -->
+  <section class="panel on panel-card" id="p-year">
+    <div class="toolbar"><div class="grp"><b>Jahreskennzahlen</b><span class="hint" id="year-sub"></span></div>
+      <div class="grp"><button class="btn" id="dl-kpi" type="button" disabled>⬇ CSV</button></div></div>
+    <div class="kpi-groups" id="kpi-groups"></div>
+    <p class="note">Volllaststunden = Jahresertrag / Nennleistung. Auslastungsfaktor = Volllaststunden / 8760 h. Gesamtwirkungsgrad = Stromertrag / Energie des Windes, die im Jahresverlauf durch die Rotorfläche strömt (inkl. Stunden mit Nennleistungs-Begrenzung und Abschaltung).</p>
+    <p class="note" id="data-note"></p>
+    <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--ink-2)">Methodik &amp; Annahmen</summary>
+      <ul class="methods" id="methods" style="margin-top:6px;font-size:13px;color:var(--ink-2)"></ul>
+    </details>
+  </section>
+
+    <!-- Grundlagen -->
+  <section class="panel panel-card" id="p-theory">
+    <div class="theory">
+      <h2>Theoretische Grundlagen der Windertragsberechnung</h2>
+      <p>Die Berechnung folgt der Ertragsrechnung der Vorlesung (Winddaten → Höhenprofil → Leistungskennlinie → Ertrag) und ist für jede Stunde des Jahres dieselbe:</p>
+      <div class="chain">
+        <span>Winddaten<small>v in Messhöhe, Richtung</small></span><i>→</i>
+        <span>Windprofil<small>Rauhigkeit z<sub>0</sub>, Höhe</small></span><i>→</i>
+        <span>v in Nabenhöhe<small>v(h<sub>Nabe</sub>)</small></span><i>→</i>
+        <span>Leistungskennlinie<small>P(v)</small></span><i>→</i>
+        <span>Stundenertrag<small>E = P · 1 h</small></span><i>→</i>
+        <span>Kennzahlen<small>Volllaststunden, Auslastung</small></span>
+      </div>
+
+      <h3>1 · Entstehung des Windes</h3>
+      <ul>
+        <li><b>Global:</b> Die Sonne erwärmt Äquator und Pole unterschiedlich. Die Temperaturunterschiede treiben großräumige Luftzirkulationen an; Erdrotation und Corioliskraft lenken sie ab (z. B. Passatwinde).</li>
+        <li><b>Lokal:</b> Temperaturunterschiede zwischen Land und Wasser erzeugen die See-Land-Brise, deshalb sind Küstenregionen windreich. Hindernisse (Gebäude, Wald, Hügel) bremsen und verwirbeln den Wind.</li>
+        <li><b>Windatlas:</b> Der Europäische Windatlas gibt Mittelwerte in 50 m Höhe an, der Deutsche Windatlas in 10 m. Meteorologische Messungen (DWD) liegen fast immer in 10 m Höhe, <b>Windkraftanlagen stehen aber in 100 m und mehr</b>. Deshalb braucht jede Ertragsrechnung ein Höhenprofil.</li>
+      </ul>
+
+      <h3>2 · Leistung und Energie des Windes</h3>
+      <p>Die im Wind enthaltene Leistung durch eine Fläche A (hier die Rotorfläche A = π r²) ist</p>
+      <div class="formula">\[ P_0=\tfrac12\,\rho\,A\,v^3,\qquad E_0=\tfrac12\,\rho\,A\,v^3\,\Delta t \]</div>
+      <ul>
+        <li><b>Luftdichte ρ:</b> hängt von Temperatur und Höhe ab (0 °C, 1 bar: 1,275 kg/m³; Normdichte der Standardatmosphäre auf Meereshöhe: 1,225 kg/m³). In 740 m ü. NN sind es nur noch etwa 1,13 kg/m³.</li>
+        <li><b>Windgeschwindigkeit v:</b> geht mit der dritten Potenz ein. Doppelte Windgeschwindigkeit bedeutet die achtfache Leistung. Deshalb lohnen sich hohe Türme und windreiche Standorte.</li>
+        <li><b>Beispiel:</b> Rotordurchmesser 100 m, v = 10 m/s, ρ = 1,225 kg/m³ ergibt P₀ = ½ · 1,225 · 7854 m² · (10 m/s)³ ≈ 4,8 MW.</li>
+      </ul>
+
+      <h3>3 · Windgeschwindigkeitsverteilung (Weibull, Rayleigh)</h3>
+      <p>Für den Jahresertrag zählt nicht ein einzelner Wert, sondern die <b>Häufigkeitsverteilung</b> der Windgeschwindigkeit. Sie wird tabellarisch (Histogramm) oder durch statistische Funktionen beschrieben:</p>
+      <div class="formula">\[ f(v)=\frac{k}{A}\left(\frac{v}{A}\right)^{k-1}\exp\!\left[-\left(\frac{v}{A}\right)^{k}\right],\qquad \bar v = A\,\Gamma\!\left(1+\tfrac1k\right) \]</div>
+      <ul>
+        <li><b>Weibull-Verteilung</b> mit Formparameter k und Skalenparameter A (standortabhängig). Die Seite bestimmt k und A per Maximum-Likelihood-Schätzung aus den Stundenwerten.</li>
+        <li><b>Rayleigh-Verteilung</b> ist der Sonderfall k = 2 und braucht nur die mittlere Windgeschwindigkeit:
+          <div class="formula">\[ f(v)=\frac{\pi}{2}\,\frac{v}{\bar v^{2}}\exp\!\left[-\frac{\pi}{4}\left(\frac{v}{\bar v}\right)^{2}\right] \]</div></li>
+      </ul>
+      <p>Wer nur die Verteilung kennt, kann den Ertrag näherungsweise berechnen: \( E \approx 8760\,\mathrm{h}\cdot\int P(v)\,f(v)\,dv \). Im Reiter „Jahreswerte“ stehen die so gerechneten Näherungen neben dem Ergebnis aus der Stundenzeitreihe.</p>
+
+      <h3>4 · Windprofil: von der Messhöhe zur Nabenhöhe</h3>
+      <p>Durch Reibung am Boden nimmt die Windgeschwindigkeit mit der Höhe zu. Wie stark, bestimmt die <b>Rauhigkeitslänge z<sub>0</sub></b> des Geländes. Zwei Verfahren sind umgesetzt (wählbar in der Seitenleiste):</p>
+      <ul>
+        <li><b>Logarithmisches Grenzschichtprofil:</b> rechnet v(h<sub>1</sub>) aus der Messung auf die Nabenhöhe h<sub>2</sub> um.
+          <div class="formula">\[ v(h_2)=v(h_1)\cdot\frac{\ln(h_2/z_0)}{\ln(h_1/z_0)} \]</div></li>
+        <li><b>Exponentielles Profil nach Hellmann</b> mit dem Hellmann-Exponenten α:
+          <div class="formula">\[ v(h_2)=v(h_1)\cdot\left(\frac{h_2}{h_1}\right)^{\alpha},\qquad \alpha=\frac{1}{\ln\!\left(\sqrt{h_1\,h_2}\,/\,z_0\right)} \]</div></li>
+      </ul>
+      <p>Das logarithmische Profil gilt in der bodennahen Grenzschicht und ist bei Nabenhöhen über etwa 100 m nicht zu empfehlen, weil die Bodenrauhigkeit in größeren Höhen nur noch wenig Einfluss hat. Typische Rauhigkeitslängen:</p>
+      <table>
+        <tr><th>z<sub>0</sub> in m</th><th>Geländetyp</th></tr>
+        <tr><td>0,0002</td><td>Wasserflächen: Meer und Seen</td></tr>
+        <tr><td>0,0024</td><td>Offenes Gelände mit glatter Oberfläche (Beton, Landebahnen, gemähtes Gras)</td></tr>
+        <tr><td>0,03</td><td>Offenes landwirtschaftliches Gelände ohne Zäune und Hecken, sanfte Hügel</td></tr>
+        <tr><td>0,055</td><td>Offenes Gelände mit einigen Häusern und 8 m hohen Hecken im Abstand &gt; 1 km</td></tr>
+        <tr><td>0,1</td><td>Landwirtschaftliches Gelände mit vielen oder hohen Hecken (Abstand ca. 500 m)</td></tr>
+        <tr><td>0,2</td><td>Landwirtschaftliches Gelände mit vielen Häusern, Büschen, Pflanzen (Hecken ca. 250 m)</td></tr>
+        <tr><td>0,4</td><td>Dörfer, Kleinstädte, Gelände mit vielen hohen Hecken, Wäldern; raues, unebenes Terrain</td></tr>
+        <tr><td>0,6</td><td>Größere Städte mit hohen Wohngebäuden</td></tr>
+        <tr><td>1,6</td><td>Großstädte mit hohen Gebäuden und Wolkenkratzern</td></tr>
+      </table>
+
+      <h3>5 · Energiewandlung: Betz’scher Leistungsbeiwert</h3>
+      <p>Die Windturbine bremst den Wind von v<sub>1</sub> auf v<sub>2</sub> ab; der Massenstrom bleibt konstant. Entnommene Leistung und Leistungsbeiwert c<sub>P</sub> (Verhältnis von entnommener Leistung zur Leistung des Windes) sind</p>
+      <div class="formula">\[ P_N=\tfrac12\,\dot m\,(v_1^2-v_2^2),\qquad c_P=\frac{P_N}{P_0}=\tfrac12\left(1+\frac{v_2}{v_1}\right)\left(1-\frac{v_2^2}{v_1^2}\right) \]</div>
+      <p>Das Maximum liegt bei v<sub>2</sub>/v<sub>1</sub> = 1/3 und ergibt den <b>Betz’schen Leistungsbeiwert</b></p>
+      <div class="formula">\[ c_{P,\mathrm{Betz}}=\frac{16}{27}\approx 0{,}593 \]</div>
+      <p>Mehr als 59 % der Windenergie lassen sich also physikalisch nicht entnehmen, in der Praxis erreichen moderne Rotoren 45–52 %. Der Leistungsbeiwert der gewählten Anlage in Abhängigkeit von der Windgeschwindigkeit zeigt der Reiter „Leistungskurve“ (unteres Diagramm).</p>
+      <ul>
+        <li><b>Auftriebsläufer</b> (Horizontalachse, Dreiblatt-Rotor) nutzen den aerodynamischen Auftrieb und erreichen die höchsten Wirkungsgrade; <b>Widerstandsläufer</b> (z. B. Schalenkreuzanemometer, Savonius) sind einfach, aber ineffizient.</li>
+        <li>Die <b>Schnelllaufzahl</b> λ = Blattspitzengeschwindigkeit / Windgeschwindigkeit bestimmt die Auslegung: Langsamläufer λ ≈ 1 (Westernmill), Schnellläufer λ = 5–9 (Stromerzeugung).</li>
+      </ul>
+
+      <h3>6 · Wirkungsgradkette</h3>
+      <p>Vom Wind bis ins Netz treten mehrere Verluste auf: aerodynamische Verluste (Betz: 41 %, dazu Rotorverluste), mechanische Verluste (Lager, Getriebe) und elektrische Verluste (Generator, Umrichter, Kabel). Der Gesamtwirkungsgrad ist das Produkt der Einzelwirkungsgrade:</p>
+      <div class="formula">\[ \eta_\mathrm{ges}=c_P\cdot\eta_\mathrm{Getriebe}\cdot\eta_\mathrm{Generator}\cdot\eta_\mathrm{Umrichter}\cdots=\frac{P_N}{P_0} \]</div>
+      <p>Für ganze Anlagen werden typisch 29–51 % angegeben. Die Seite weist den <b>energetischen Gesamtnutzungsgrad</b> (Stromertrag geteilt durch die im Jahr durch die Rotorfläche strömende Windenergie) in den Jahreswerten aus; er liegt niedriger als der Wirkungsgrad im Auslegungspunkt, weil die Anlage bei starkem Wind auf Nennleistung begrenzt bzw. abgeschaltet wird.</p>
+
+      <h3>7 · Leistungskennlinie</h3>
+      <p>Die Leistungskennlinie P(v) des Herstellers gibt die elektrische Leistung in Abhängigkeit von der Windgeschwindigkeit in Nabenhöhe an und hat vier Phasen:</p>
+      <table>
+        <tr><th>Phase</th><th>Bereich</th><th>Verhalten</th></tr>
+        <tr><td>I</td><td>v &lt; v<sub>min</sub> (Einschaltgeschwindigkeit)</td><td>Die Anlage läuft nicht an, keine Leistung.</td></tr>
+        <tr><td>II</td><td>v<sub>min</sub> … v<sub>Nenn</sub></td><td>Stromproduktion; die Leistung steigt (annähernd mit v³) bis zur Nennleistung.</td></tr>
+        <tr><td>III</td><td>v<sub>Nenn</sub> … v<sub>max</sub></td><td>Die Leistung wird durch die Regelung konstant auf Nennleistung gehalten.</td></tr>
+        <tr><td>IV</td><td>v &gt; v<sub>max</sub> (Abschaltgeschwindigkeit)</td><td>Abschaltung zum Schutz vor Schäden (Rotorblätter in Fahnenstellung).</td></tr>
+      </table>
+      <p>Zwei Regelungsverfahren begrenzen die Leistung: die <b>Stall-Regelung</b> (passiv, durch Strömungsabriss) und die <b>Pitch-Regelung</b> (aktiv, durch Verstellen der Blattwinkel; Stand der Technik bei modernen netzgekoppelten Anlagen). Die Ertragsberechnung interpoliert die Kennlinie linear zwischen den Stützstellen. Zwischen Nennleistung und Abschaltung ist die Kurve flach, deshalb sind die genauen Windgeschwindigkeiten in diesem Bereich für den Ertrag unkritisch.</p>
+
+      <h3>8 · Ertragsberechnung und Kennzahlen</h3>
+      <p>Die Stundenwerte der Windgeschwindigkeit werden auf Nabenhöhe umgerechnet, mit der Kennlinie in Leistung (Stundenmittel) umgesetzt und zu Tages-, Monats- und Jahreswerten summiert. Die mittlere Leistung in kW entspricht über eine Stunde der Energie in kWh:</p>
+      <div class="formula">\[ E=\sum_{i=1}^{8760} P\bigl(v_{\mathrm{Nabe},i}\bigr)\cdot 1\,\mathrm{h} \]</div>
+      <table>
+        <tr><th>Kennzahl</th><th>Definition</th><th>Aussage</th></tr>
+        <tr><td>Jahresertrag E</td><td>Summe aller Stundenerträge [MWh]</td><td>erzeugte Energie</td></tr>
+        <tr><td>Volllaststunden</td><td>\( E / P_\mathrm{nenn} \) [h]</td><td>Zeit, die die Anlage mit Nennleistung laufen müsste, um E zu erzeugen. Neue Onshore-Anlagen etwa 1800–3200 h, Offshore etwa 3200–4500 h</td></tr>
+        <tr><td>Auslastungsfaktor</td><td>\( \dfrac{E}{P_\mathrm{nenn}\cdot 8760\,\mathrm{h}} \)</td><td>mittlere Auslastung der Nennleistung im Jahr (= Volllaststunden / 8760)</td></tr>
+        <tr><td>Windleistungsdichte</td><td>\( \overline{\tfrac12\rho v^3} \) [W/m²]</td><td>Energieangebot des Standorts unabhängig von der Anlage</td></tr>
+        <tr><td>Weibull k, A</td><td>Parameter der Verteilung</td><td>Form (Böigkeit) und Größe (Windniveau) der Häufigkeitsverteilung</td></tr>
+      </table>
+      <p><b>Einordnung (Vorlesungsfolien):</b> Neue Anlagen haben etwa 4–7 MW Nennleistung bei 120–170 m Nabenhöhe. Offshore-Anlagen erzeugen wegen höherer und gleichmäßigerer Windgeschwindigkeiten rund 50 % mehr Strom als Onshore-Anlagen, benötigen aber etwa doppelt so hohe Investitionen. Orientierungswerte (Fraunhofer ISE): Investitionskosten onshore ca. 1500 €/kW, offshore ca. 3500 €/kW; Stromgestehungskosten onshore 4–8 ct/kWh, offshore 7,5–14 ct/kWh.</p>
+
+      <h3>9 · Winddaten und Standorte</h3>
+      <ul>
+        <li><b>Zeitreihen:</b> stündliche Windgeschwindigkeit und -richtung des Kalenderjahres 2025 (8760 Stunden, Zeitstempel in UTC). Ein einzelnes Wetterjahr ist nicht das langjährige Mittel: Der Jahresertrag schwankt von Jahr zu Jahr real um einige Prozent bis über 10 %.</li>
+        <li><b>DWD-Messstationen</b> messen in <b>10–42 m</b> Höhe über Grund (Anemometerhöhe je Station in der Standortinfo). Die Messhöhe ist eine Eingabe, damit das Profil von der richtigen Höhe aus rechnet. Datenlücken sind linear interpoliert; ihr Umfang steht im Hinweis unter der Standortwahl.</li>
+        <li><b>Offshore:</b> Für die Nord- und Ostsee gibt es keine freien Langzeit-Messreihen auf See. Die Seite nutzt dafür die <b>ERA5-Reanalyse</b> (Open-Meteo), die Wind direkt in 10 m und 100 m liefert. Die Option „100 m direkt verwenden“ ersetzt die Umrechnung und erlaubt, das Windprofil zu überprüfen. Messnahe Alternativen sind Leuchttürme (hier: Leuchtturm Kiel) und Inseln (Helgoland, Norderney).</li>
+        <li><b>Gebirgsstandorte</b> (Schauinsland, Feldberg): Rasterdaten wie ERA5 glätten das Relief und unterschätzen Gipfelwinde stark; für den Schwarzwald sind die DWD-Messungen vom Feldberg die bessere Grundlage.</li>
+      </ul>
+
+      <h3>10 · Grenzen des Modells</h3>
+      <ul>
+        <li>Die Berechnung ist eine <b>grobe Abschätzung</b>. Für belastbare Aussagen braucht man ein gemessenes oder modelliertes Windprofil am Standort (Messmast, Lidar, Windatlas, Windgutachten).</li>
+        <li>Die Höhenextrapolation ist eine Näherung für neutrale Schichtung. Wald, Orographie, thermische Schichtung und Windscherung werden nicht erfasst.</li>
+        <li>Stundenmittelwerte glätten Böen und Turbulenz. Eine nichtlineare Kennlinie auf Mittelwerte anzuwenden, ist ein Näherungsverfahren.</li>
+        <li>Keine Nachlaufverluste im Windpark, keine Schall-, Schattenwurf- oder Naturschutzabschaltungen, keine Netzengpässe, keine Eisabschaltung. Verfügbarkeit, Nachlauf und Elektrik lassen sich pauschal als „Sonstige Verluste“ ansetzen.</li>
+        <li>Standardmäßig wird mit der Normdichte 1,225 kg/m³ gerechnet; optional kann die Dichte aus der Standardatmosphäre (Standorthöhe + Nabenhöhe) korrigiert werden.</li>
+      </ul>
+
+      <h3>Hinweise zur Umsetzung</h3>
+      <ul>
+        <li><b>Generische Anlage:</b> normierte Kennlinie, die mit Nennleistung und Rotordurchmesser skaliert wird (Nennleistung ab ca. 17 m/s, Abschaltung bei 25 m/s). Alternativ stehen reale Anlagentypen mit Herstellerkennlinie zur Verfügung.</li>
+        <li><b>Leistungskurve mit Stundenwerten:</b> Im Diagramm „Leistungskurve mit Häufigkeitsverteilung“ (Zeile Leistung [kW]) ist jeder Punkt eine Stunde des Jahres (Windgeschwindigkeit in Nabenhöhe, Leistung). Die Punkte liegen auf der Kennlinie; ihre Dichte zeigt, in welchem Bereich die Anlage die meiste Zeit arbeitet. Im oberen Diagramm ist zum Vergleich die Windleistung \( P_0=\tfrac12\rho A v^3=\tfrac12\dot m v^2 \) mit \( \dot m=\rho A v \) und die Betz-Grenze \( \tfrac{16}{27}P_0 \) eingezeichnet.</li>
+        <li>Die Seite rechnet mit der tatsächlichen Stundenzahl des gewählten Jahres (auch Schaltjahre).</li>
+      </ul>
+    </div>
+  </section>
+
+
+
+  <!-- Monatswerte -->
+  <section class="panel panel-card" id="p-month">
+    <div class="toolbar">
+      <div class="grp"><label for="month-metric" class="lbl">Darstellung</label>
+        <select id="month-metric">
+          <option value="yield">Stromertrag [MWh]</option>
+          <option value="flh">Volllaststunden [h]</option>
+          <option value="cf">Auslastungsfaktor [%]</option>
+          <option value="wind">Ø Windgeschwindigkeit: Messhöhe vs. Nabenhöhe [m/s]</option>
+          <option value="op">Betriebsstunden [h]</option>
+        </select></div>
+      <div class="grp"><button class="btn" data-csv="monthly" type="button" disabled>⬇ CSV</button></div>
+    </div>
+    <div id="chart-month" class="chart"></div>
+    <div class="tablewrap" id="tbl-month"></div>
+  </section>
+
+  <!-- Tageswerte -->
+  <section class="panel panel-card" id="p-day">
+    <div class="toolbar">
+      <div class="grp"><label for="day-metric" class="lbl">Darstellung</label>
+        <select id="day-metric">
+          <option value="yield">Stromertrag [MWh]</option>
+          <option value="wind">Ø Windgeschwindigkeit Nabenhöhe [m/s]</option>
+          <option value="flh">Volllaststunden [h]</option>
+          <option value="cf">Auslastungsfaktor [%]</option>
+        </select></div>
+      <div class="grp"><button class="btn" data-csv="daily" type="button" disabled>⬇ CSV</button></div>
+    </div>
+    <div id="chart-day" class="chart"></div>
+    <div class="tablewrap" id="tbl-day"></div>
+  </section>
+
+  <!-- Stundenwerte -->
+  <section class="panel panel-card" id="p-hour">
+    <div class="toolbar">
+      <div class="grp">
+        <label for="h-start" class="lbl">Ab</label><input type="date" id="h-start">
+        <button class="chip on" data-span="7" type="button">1 Woche</button>
+        <button class="chip" data-span="31" type="button">1 Monat</button>
+        <button class="chip" data-span="92" type="button">3 Monate</button>
+        <button class="chip" data-span="0" type="button">Ganzes Jahr</button>
+      </div>
+      <div class="grp"><button class="btn" data-csv="hourly" type="button" disabled>⬇ CSV</button></div>
+    </div>
+    <div id="chart-hour" class="chart tall"></div>
+    <p class="note">Zeitachse in UTC; Zeitstempel = Beginn der Stunde. Windrichtung = Richtung, aus der der Wind weht (0° = Nord, 90° = Ost). Zoomen per Auswahl, Navigieren mit dem Schieberegler unten.</p>
+    <div class="tablewrap" id="tbl-hour"></div>
+    <p class="note" id="hour-note"></p>
+  </section>
+
+  <!-- Leistungskurve -->
+  <section class="panel panel-card" id="p-curve">
+    <div class="block">
+      <div class="subhead">Leistungskurve und Leistungsbeiwert</div>
+      <p class="note" id="curve-note"></p>
+      <div id="chart-curve" class="chart tall" style="height:620px"></div>
+    </div>
+    <div class="block">
+      <div class="subhead">Leistungskurve mit Häufigkeitsverteilung der Windgeschwindigkeit</div>
+      <p class="note">Häufigkeit (Stunden pro Jahr in Klassen von 1 m/s, Nabenhöhe) × Leistung = Ertrag je Klasse; die Summe der Balken unten ist der Jahresertrag.</p>
+      <div id="chart-curve-hist" class="chart tall" style="height:700px"></div>
+    </div>
+  </section>
+
+  <!-- Verteilung -->
+  <section class="panel panel-card" id="p-dist">
+    <div class="block">
+      <div class="subhead">Häufigkeitsverteilung der Windgeschwindigkeit in Nabenhöhe</div>
+      <p class="note" id="dist-note"></p>
+      <div id="chart-dist" class="chart"></div>
+    </div>
+    <div class="block">
+      <div class="subhead">Sortierte Jahresdauerlinie der Leistung</div>
+      <p class="note">Stundenwerte der Leistung, absteigend sortiert. Die Fläche unter der Kurve ist der Jahresertrag.</p>
+      <div id="chart-dur" class="chart"></div>
+    </div>
+  </section>
+
+  <!-- Windrichtung -->
+  <section class="panel panel-card" id="p-dir">
+    <p class="note" style="margin-top:0;margin-bottom:8px">Windrichtung = Richtung, aus der der Wind weht, in 10°-Sektoren (Norden oben). Geschwindigkeit und Ertrag gelten für die Nabenhöhe.</p>
+    <div class="polar-grid">
+      <div><div class="subhead">Häufigkeit der Windrichtung</div><div id="chart-dir-share" class="chart sq"></div></div>
+      <div><div class="subhead">Ø Windgeschwindigkeit je Richtung</div><div id="chart-dir-v" class="chart sq"></div></div>
+      <div><div class="subhead">Stromertrag je Richtung</div><div id="chart-dir-e" class="chart sq"></div></div>
+    </div>
+  </section>
+
+  <!-- Windprofil -->
+  <section class="panel panel-card" id="p-prof">
+    <div class="block">
+      <div class="subhead">Höhenprofil der Windgeschwindigkeit</div>
+      <p class="note" id="prof-note"></p>
+      <div id="chart-prof" class="chart"></div>
+    </div>
+    <div class="block">
+      <div class="subhead">Einfluss der Geländerauhigkeit</div>
+      <p class="note">Gleiche mittlere Windgeschwindigkeit in Messhöhe, unterschiedliche Rauhigkeitslängen (Geländetypen), mit dem gewählten Profilverfahren.</p>
+      <div id="chart-prof2" class="chart"></div>
+    </div>
+  </section>
+
+  <!-- Heatmap -->
+  <section class="panel panel-card" id="p-heat">
+    <div class="toolbar"><div class="grp"><b>Ertrag je Stunde und Tag</b><span class="hint">[kWh] – Stunde = Beginn des Intervalls, UTC</span></div></div>
+    <div id="chart-heat" class="chart tall"></div>
+  </section>
+</main>
+</div>
+
+<footer>
+  <b>wind.sim</b> – Ertragssimulation von Windenergieanlagen. Rechenkern: Python (numpy, pandas) im Browser mit exponentiellem (Hellmann) bzw. logarithmischem Windprofil und Leistungskennlinie. Winddaten: DWD Climate Data Center (Quelle: Deutscher Wetterdienst) bzw. ERA5-Reanalyse (Copernicus/ECMWF) über Open-Meteo (CC BY 4.0). Anlagenkennlinien: Herstellerangaben aus der windpowerlib/OEDB-Bibliothek. Ergebnisse sind Prognosen, keine Garantie.
+  <div style="margin-top:8px"><b>Credits:</b> wind.sim: Prof. Dr. Manuel Lämmle, Hochschule Offenburg. Erstellt für das Modul „Erneuerbare Energie“ im Studiengang Sustainable Business Development.</div>
+  <div style="margin-top:4px"><b>Vorlage (Excel-Tool):</b> Mitarbeit am Tool durch Jeannine Riemer und Samuel Trester. Riemer, Jeannine; Trester, Samuel; te Heesen, Henrik (2026). Windenergie-Ertragssimulation (Version vom 4. August 2026) [Computerprogramm]. Hochschule Trier. Verfügbar unter: <a href="https://umwelt-campus.de/energietools" target="_blank" rel="noopener">umwelt-campus.de/energietools</a> (Zugriff am: 4. November 2026).</div>
+</footer>
+
+<!-- ========================= PYTHON-MODELL ========================= -->
+<script type="text/x-python" id="wind-model">
+"""Windertragsmodell (läuft lokal und im Browser via Pyodide, nur numpy + pandas).
+
+Ablauf:
+  1. Wetterdaten laden  (load_csv / load_openmeteo)  -> Zustand in _STATE
+  2. simulate(params_json)                            -> JSON-String mit allen Ergebnissen
+  3. get_csv(kind) / get_xlsx()                       -> Downloads
+
+Rechenkette:
+  v(Messhöhe) -> Windprofil (Hellmann-Exponent oder logarithmisch) -> v(Nabenhöhe)
+              -> Leistungskennlinie P(v) -> Stundenertrag [kWh] (Stundenmittel [kW] * 1 h)
+
+Zeitkonvention: Zeitstempel in UTC (Stundenbeginn), Tages-/Monatswerte in UTC.
+"""
+import io
+import json
+import math
+
+import numpy as np
+import pandas as pd
+
+_STATE = {"wx": None, "meta": None, "result": None}
+
+MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August",
+          "September", "Oktober", "November", "Dezember"]
+RHO0 = 1.225  # kg/m³, Normdichte (ISA, 15 °C, Meereshöhe)
+
+
+# ----------------------------------------------------------------------------------------------
+# Wetterdaten laden
+# ----------------------------------------------------------------------------------------------
+def load_csv(csv_text, meta_json):
+    """CSV mit Spalten wind_speed, wind_dir [, wind_speed_100m, wind_dir_100m]; 8760 Stunden ab 1.1. 00:00 UTC."""
+    meta = json.loads(meta_json)
+    df = pd.read_csv(io.StringIO(csv_text))
+    year = int(meta.get("year", 2025))
+    df.index = pd.date_range(f"{year}-01-01", periods=len(df), freq="h")
+    _STATE["wx"], _STATE["meta"], _STATE["result"] = df, meta, None
+    return len(df)
+
+
+def load_openmeteo(json_text, meta_json):
+    """Open-Meteo-Archive-Antwort (timezone=GMT, wind_speed_unit=ms; Zeitstempel = Stundenbeginn)."""
+    meta = json.loads(meta_json)
+    h = json.loads(json_text)["hourly"]
+    idx = pd.to_datetime(h["time"])
+    df = pd.DataFrame({
+        "wind_speed": h["wind_speed_10m"], "wind_dir": h["wind_direction_10m"],
+        "wind_speed_100m": h["wind_speed_100m"], "wind_dir_100m": h["wind_direction_100m"],
+    }, index=idx)
+    df = df.interpolate(limit_direction="both")
+    _STATE["wx"], _STATE["meta"], _STATE["result"] = df, meta, None
+    return len(df)
+
+
+# ----------------------------------------------------------------------------------------------
+# Physik
+# ----------------------------------------------------------------------------------------------
+def hellmann_alpha(h_hub, h_ref, z0):
+    """Hellmann-Exponent: alpha =1 / ln( sqrt(h_hub * h_ref) / z0 )."""
+    return 1.0 / math.log(math.sqrt(h_hub * h_ref) / z0)
+
+
+def profile_factor(h_hub, h_ref, z0, kind):
+    if kind == "log":
+        return math.log(h_hub / z0) / math.log(h_ref / z0)
+    return (h_hub / h_ref) ** hellmann_alpha(h_hub, h_ref, z0)
+
+
+def air_density(altitude_m):
+    """Luftdichte der Standardatmosphäre (ISA) in Höhe H über NN."""
+    return RHO0 * (1.0 - 2.25577e-5 * altitude_m) ** 4.25588
+
+
+def weibull_fit(v):
+    """Maximum-Likelihood-Schätzung (Form k, Skala A) für v > 0; reine numpy-Iteration."""
+    v = v[v > 0.05]
+    lv = np.log(v)
+    k = 2.0
+    for _ in range(200):
+        vk = v ** k
+        k_new = 1.0 / ((vk * lv).sum() / vk.sum() - lv.mean())
+        if abs(k_new - k) < 1e-7:
+            k = k_new
+            break
+        k = 0.5 * (k + k_new)
+    a = float(np.mean(v ** k) ** (1.0 / k))
+    return float(k), a
+
+
+def weibull_cdf(v, k, a):
+    return 1.0 - np.exp(-(np.maximum(v, 0.0) / a) ** k)
+
+
+def _num(p, key, default):
+    try:
+        x = float(p.get(key, default))
+    except (TypeError, ValueError):
+        return default
+    return default if math.isnan(x) else x
+
+
+# ----------------------------------------------------------------------------------------------
+# Simulation
+# ----------------------------------------------------------------------------------------------
+def simulate(params_json):
+    p = json.loads(params_json)
+    wx, meta = _STATE["wx"], _STATE["meta"]
+    if wx is None:
+        raise ValueError("Keine Wetterdaten geladen.")
+
+    hub = _num(p, "hub", 100.0)
+    z0 = _num(p, "z0", 0.1)
+    kind = p.get("profile", "exp")  # 'exp' | 'log'
+    loss = _num(p, "loss_pct", 0.0) / 100.0
+    use100 = bool(p.get("use100")) and "wind_speed_100m" in wx.columns
+    h_ref = 100.0 if use100 else _num(p, "h_ref", 10.0)
+    cv = np.array(p["curve"]["v"], float)
+    cp_mw = np.array(p["curve"]["p"], float)  # MW
+    pn = _num(p, "p_nom_mw", float(cp_mw.max()))
+    d_rot = _num(p, "rotor_d", 0.0)
+    area = math.pi * d_rot ** 2 / 4.0 if d_rot > 0 else None
+    if pn <= 0:
+        raise ValueError("Die Nennleistung muss größer 0 sein.")
+    if z0 <= 0 or z0 >= min(h_ref, hub):
+        raise ValueError("Die Rauhigkeitslänge muss größer 0 und kleiner als Mess- und Nabenhöhe sein.")
+    if hub <= 0 or h_ref <= 0:
+        raise ValueError("Nabenhöhe und Messhöhe müssen größer 0 sein.")
+
+    v_ref = wx["wind_speed_100m" if use100 else "wind_speed"].astype(float)
+    wd = wx["wind_dir_100m" if use100 else "wind_dir"].astype(float)
+    fac = profile_factor(hub, h_ref, z0, kind)
+    v_hub = (v_ref * fac).round(2)
+
+    alt = meta.get("altitude") or 0.0
+    rho = air_density(alt + hub) if p.get("density") else RHO0
+    v_eq = v_hub * (rho / RHO0) ** (1.0 / 3.0)  # dichtekorrigierte Geschwindigkeit für die Kennlinie
+    power_kw = np.interp(v_eq, cv, cp_mw, left=0.0, right=0.0) * 1000.0 * (1.0 - loss)  # kW (Stundenmittel)
+    power_kw = pd.Series(power_kw, index=wx.index)
+    yield_kwh = power_kw  # * 1 h
+    pw_kw = 0.5 * rho * area * v_hub ** 3 / 1000.0 if area else None  # Windleistung durch die Rotorfläche
+
+    n_h = len(wx)
+    h = pd.DataFrame({"v_ref": v_ref, "v_hub": v_hub, "wd": wd, "p_kw": power_kw}, index=wx.index)
+    if pw_kw is not None:
+        h["pw_kw"] = pw_kw
+    h["month"], h["date"], h["hour"] = h.index.month, h.index.normalize(), h.index.hour
+    h["op"] = (h["p_kw"] > 0).astype(int)
+
+    def agg(g):
+        nh = g["p_kw"].count()
+        e = g["p_kw"].sum() / 1000.0  # MWh
+        return pd.DataFrame({
+            "v_ref": g["v_ref"].mean(), "v_hub": g["v_hub"].mean(), "yield_mwh": e,
+            "flh": e / pn, "cf": e / pn / nh * 100.0, "op_h": g["op"].sum(),
+        })
+
+    monthly = agg(h.groupby("month"))
+    daily = agg(h.groupby("date"))
+    monthly.index = [MONATE[m - 1] for m in monthly.index]
+    e_year = float(h["p_kw"].sum() / 1000.0)
+    monthly["share"] = monthly["yield_mwh"] / e_year * 100.0 if e_year > 0 else 0.0
+
+    # --- Kennlinie
+    nz = np.where(cp_mw > 0)[0]
+    v_in_t = float(cv[nz[0]]) if len(nz) else float("nan")      # Kennlinien-Werte (bezogen auf v_eq)
+    v_out_t = float(cv[nz[-1]]) if len(nz) else float("nan")
+    rated = np.where(cp_mw >= 0.99 * cp_mw.max())[0]
+    v_rated_t = float(cv[rated[0]]) if len(rated) else float("nan")
+    scale = (rho / RHO0) ** (1.0 / 3.0)  # v_eq = v_hub * scale; ohne Dichtekorrektur ist scale = 1
+    v_in, v_out, v_rated = v_in_t / scale, v_out_t / scale, v_rated_t / scale  # bezogen auf die Windgeschwindigkeit in Nabenhöhe
+    vv = np.arange(0.0, max(30.0, math.ceil(v_out) + 2), 0.1)
+    pcurve = np.interp(vv * scale, cv, cp_mw, left=0.0, right=0.0) * (1.0 - loss)  # MW
+    cp_curve = pw_curve = betz_curve = None
+    if area:
+        pwv = 0.5 * rho * area * vv ** 3 / 1e6  # MW: Leistung des Windes P0 = 1/2 * rho * A * v^3 (= 1/2 * m_dot * v^2)
+        pw_curve, betz_curve = pwv * 1000.0, pwv * 1000.0 * 16.0 / 27.0  # kW
+        with np.errstate(divide="ignore", invalid="ignore"):
+            cp_curve = np.where((vv > 0.5) & (pcurve > 0), pcurve / pwv, np.nan)
+
+    # --- Verteilung der Nabenhöhen-Geschwindigkeit, Weibull/Rayleigh
+    vmax = max(30.0, math.ceil(v_hub.max()) + 1)
+    edges = np.arange(0.0, vmax + 1.0, 1.0)
+    cnt, _ = np.histogram(v_hub, bins=edges)
+    ycls = np.array([h.loc[(v_hub >= a) & (v_hub < b), "p_kw"].sum() / 1000.0 for a, b in zip(edges[:-1], edges[1:])])
+    k_w, a_w = weibull_fit(v_hub.to_numpy())
+    vbar = float(v_hub.mean())
+    a_r = 2.0 * vbar / math.sqrt(math.pi)  # Rayleigh = Weibull mit k = 2 und gleicher Mittelwert
+    cdf_w, cdf_r = weibull_cdf(edges, k_w, a_w), weibull_cdf(edges, 2.0, a_r)
+    fit_w, fit_r = n_h * np.diff(cdf_w), n_h * np.diff(cdf_r)
+
+    def e_dist(k, a):  # Ertrag [MWh] bei Weibull-Verteilung, Integration in 0,05-m/s-Schritten
+        g = np.arange(0.0, 40.0, 0.05)
+        pr = np.diff(weibull_cdf(np.append(g, 40.0), k, a))
+        pm = np.interp(g + 0.025, cv, cp_mw, left=0.0, right=0.0) * (1.0 - loss)
+        return float((pr * pm).sum() * n_h)
+
+    e_weib, e_rayl = e_dist(k_w, a_w), e_dist(2.0, a_r)
+
+    # --- Windrichtung (10°-Sektoren)
+    sec = (np.round(h["wd"] / 10.0).astype(int) * 10) % 360
+    secs = np.arange(0, 360, 10)
+    dir_cnt = np.array([(sec == s).sum() for s in secs], float)
+    dir_v = np.array([h.loc[sec == s, "v_hub"].mean() if (sec == s).any() else 0.0 for s in secs])
+    dir_e = np.array([h.loc[sec == s, "p_kw"].sum() / 1000.0 for s in secs])
+
+    # --- Höhenprofil für die mittlere Geschwindigkeit in Messhöhe
+    hs = np.arange(5, 255, 5.0)
+    vbar_ref = float(v_ref.mean())
+    prof = {k: [round(vbar_ref * profile_factor(x, h_ref, z0, k), 3) if x > z0 else None for x in hs] for k in ("exp", "log")}
+
+    # --- Jahresdauerlinie / Heatmap
+    duration = np.sort(h["p_kw"].to_numpy())[::-1]
+    heat = h.pivot_table(index="date", columns="hour", values="p_kw", aggfunc="sum").reindex(columns=range(24)).fillna(0.0)
+
+    full = float(e_year / pn)
+    op_h = int(h["op"].sum())
+    nom_h = int((h["p_kw"] >= 0.99 * pn * 1000.0 * (1.0 - loss)).sum())
+    e_wind = float(pw_kw.sum() / 1000.0) if pw_kw is not None else None
+    pk = h["p_kw"].idxmax()
+    best, worst = monthly["yield_mwh"].idxmax(), monthly["yield_mwh"].idxmin()
+    dbest = daily["yield_mwh"].idxmax()
+    winter = float(monthly.loc[["Januar", "Februar", "März", "Oktober", "November", "Dezember"], "yield_mwh"].sum() / e_year * 100.0) if e_year > 0 else 0.0
+    kpi = {
+        "yield_mwh": e_year, "flh": full, "cf": full / n_h * 100.0, "p_nom_mw": pn, "hours": n_h,
+        "v_ref_mean": vbar_ref, "v_hub_mean": vbar, "alpha": hellmann_alpha(hub, h_ref, z0), "profile_factor": fac,
+        "weibull_k": k_w, "weibull_a": a_w, "rho": rho,
+        "power_density": float((0.5 * rho * v_hub ** 3).mean()),
+        "yield_area_kwh_m2": (e_year * 1000.0 / area) if area else None,
+        "area": area, "eta_total_pct": (e_year / e_wind * 100.0) if e_wind else None,
+        "e_weibull_mwh": e_weib, "e_rayleigh_mwh": e_rayl,
+        "op_h": op_h, "nom_h": nom_h, "calm_h": int((v_eq < v_in_t).sum()), "cut_h": int((v_eq > v_out_t).sum()),
+        "v_in": v_in, "v_rated": v_rated, "v_out": v_out,
+        "peak_kw": float(h["p_kw"].max()), "peak_time": pk.strftime("%d.%m. %H:%M"),
+        "best_month": best, "best_month_mwh": float(monthly.loc[best, "yield_mwh"]),
+        "worst_month": worst, "worst_month_mwh": float(monthly.loc[worst, "yield_mwh"]),
+        "best_day": dbest.strftime("%d.%m."), "best_day_mwh": float(daily.loc[dbest, "yield_mwh"]),
+        "winter_share_pct": winter, "source": meta.get("source", ""), "year_label": meta.get("year_label", ""),
+        "filled_hours": meta.get("filled_hours", 0), "h_ref": h_ref, "hub": hub, "z0": z0, "d_rot": d_rot,
+    }
+    kpi_rows = _kpi_table(kpi, kind, p)
+
+    # --- Tabellen für Anzeige und Download
+    fmt = "%Y-%m-%d %H:%M"
+    hourly = pd.DataFrame({
+        "Zeit (UTC)": h.index.strftime(fmt),
+        f"Windgeschwindigkeit Messhöhe {h_ref:g} m [m/s]": h["v_ref"].values,
+        "Windrichtung [°]": h["wd"].values,
+        f"Windgeschwindigkeit Nabenhöhe {hub:g} m [m/s]": h["v_hub"].values,
+        "Leistung (Stundenmittel) [kW]": h["p_kw"].values,
+        "Stromertrag [kWh]": yield_kwh.values,
+    })
+    if pw_kw is not None:
+        hourly["Windleistung Rotorfläche [kW]"] = h["pw_kw"].values
+    hourly = hourly.round(3)
+    daily_t = pd.DataFrame({
+        "Datum": daily.index.strftime("%Y-%m-%d"), "Ø Windgeschwindigkeit Nabenhöhe [m/s]": daily["v_hub"].values,
+        "Stromertrag [MWh]": daily["yield_mwh"].values, "Volllaststunden [h]": daily["flh"].values,
+        "Auslastungsfaktor [%]": daily["cf"].values, "Betriebsstunden [h]": daily["op_h"].values,
+    }).round(3)
+    monthly_t = pd.DataFrame({
+        "Monat": monthly.index, "Ø Windgeschwindigkeit Messhöhe [m/s]": monthly["v_ref"].values,
+        "Ø Windgeschwindigkeit Nabenhöhe [m/s]": monthly["v_hub"].values, "Stromertrag [MWh]": monthly["yield_mwh"].values,
+        "Anteil am Jahresertrag [%]": monthly["share"].values, "Volllaststunden [h]": monthly["flh"].values,
+        "Auslastungsfaktor [%]": monthly["cf"].values, "Betriebsstunden [h]": monthly["op_h"].values,
+    }).round(3)
+    inputs = {
+        "Datenquelle": meta.get("source", ""), "Standort": meta.get("name", ""), "Wetterjahr": meta.get("year_label", ""),
+        "Breitengrad [°]": meta.get("lat"), "Längengrad [°]": meta.get("lon"), "Höhe Standort [m ü. NN]": meta.get("altitude"),
+        "Anlagentyp": p.get("curve_name", ""), "Nennleistung [MW]": pn, "Rotordurchmesser [m]": d_rot or None,
+        "Nabenhöhe [m]": hub, "Messhöhe der Winddaten [m]": h_ref, "Rauhigkeitslänge z0 [m]": z0,
+        "Windprofil": "Logarithmisch" if kind == "log" else "Exponentiell (Hellmann)",
+        "Luftdichte-Korrektur": f"ja (ρ = {rho:.3f} kg/m³)" if p.get("density") else "nein (ρ = 1,225 kg/m³)",
+        "Sonstige Verluste [%]": loss * 100.0, "Ergänzte Datenlücken [h]": meta.get("filled_hours", 0),
+    }
+    _STATE["result"] = {"hourly": hourly, "daily": daily_t, "monthly": monthly_t, "kpi": kpi_rows, "inputs": inputs}
+
+    def col(df, c, nd=3):
+        return [None if pd.isna(v) else round(float(v), nd) for v in df[c].values]
+
+    def lst(a, nd=3):
+        return [None if (x is None or (isinstance(x, float) and np.isnan(x))) else round(float(x), nd) for x in a]
+
+    out = {
+        "kpi": {k: (None if isinstance(v, float) and np.isnan(v) else (round(v, 4) if isinstance(v, float) else v)) for k, v in kpi.items()},
+        "kpi_rows": kpi_rows,
+        "monthly": {"labels": list(monthly.index), **{c: col(monthly, c) for c in ["v_ref", "v_hub", "yield_mwh", "flh", "cf", "op_h", "share"]}},
+        "daily": {"dates": list(daily.index.strftime("%Y-%m-%d")), **{c: col(daily, c) for c in ["v_hub", "yield_mwh", "flh", "cf", "op_h"]}},
+        "hourly": {"t": list(h.index.strftime(fmt)), "v_ref": col(h, "v_ref", 2), "v_hub": col(h, "v_hub", 2), "p_kw": col(h, "p_kw", 1), "wd": col(h, "wd", 0)},
+        "curve": {"v": lst(vv, 2), "p_kw": lst(pcurve * 1000.0, 1), "cp": lst(cp_curve, 4) if cp_curve is not None else None,
+                  "pw_kw": lst(pw_curve, 1) if pw_curve is not None else None, "betz_kw": lst(betz_curve, 1) if betz_curve is not None else None,
+                  "p_nom_kw": pn * 1000.0, "v_in": v_in, "v_rated": v_rated, "v_out": v_out},
+        "dist": {"edges": lst(edges, 1), "hours": [int(x) for x in cnt], "fit_weibull": lst(fit_w, 1), "fit_rayleigh": lst(fit_r, 1),
+                 "yield_mwh": lst(ycls, 2)},
+        "dir": {"sectors": [int(s) for s in secs], "share": lst(dir_cnt / dir_cnt.sum() * 100.0, 3), "v": lst(dir_v, 2), "yield_mwh": lst(dir_e, 2)},
+        "profile": {"h": lst(hs, 0), "exp": prof["exp"], "log": prof["log"], "h_ref": h_ref, "hub": hub, "v_ref": vbar_ref},
+        "duration": lst(duration, 1),
+        "heat": {"dates": list(heat.index.strftime("%Y-%m-%d")), "z": [[round(float(x), 1) for x in heat[hh].values] for hh in range(24)]},
+        "tables": {
+            "hourly_cols": list(hourly.columns), "daily_cols": list(daily_t.columns), "monthly_cols": list(monthly_t.columns),
+            "monthly_rows": monthly_t.astype(object).where(monthly_t.notna(), None).values.tolist(),
+            "daily_rows": daily_t.astype(object).where(daily_t.notna(), None).values.tolist(),
+            "hourly_preview": hourly.head(240).astype(object).where(hourly.head(240).notna(), None).values.tolist(),
+        },
+    }
+    return json.dumps(out, ensure_ascii=False)
+
+
+def _kpi_table(k, kind, p):
+    """Jahreskennzahlen als Liste (Gruppe, Name, Wert, Einheit)."""
+    def r(v, n=1):
+        return None if v is None or (isinstance(v, float) and np.isnan(v)) else round(float(v), n)
+    rows = [
+        ("Ertrag", "Jahresertrag", r(k["yield_mwh"], 1), "MWh"),
+        ("Ertrag", "Volllaststunden", r(k["flh"], 0), "h"),
+        ("Ertrag", "Auslastungsfaktor (Kapazitätsfaktor)", r(k["cf"], 1), "%"),
+        ("Ertrag", "Ertrag je Rotorfläche", r(k["yield_area_kwh_m2"], 0), "kWh/m²") if k["yield_area_kwh_m2"] else None,
+        ("Ertrag", "Spitzenleistung", r(k["peak_kw"], 0), "kW"),
+        ("Ertrag", "Zeitpunkt der Spitzenleistung", k["peak_time"], ""),
+        ("Ertrag", "Bester Monat", f'{k["best_month"]} ({k["best_month_mwh"]:.0f} MWh)', ""),
+        ("Ertrag", "Schwächster Monat", f'{k["worst_month"]} ({k["worst_month_mwh"]:.0f} MWh)', ""),
+        ("Ertrag", "Ertragreichster Tag", f'{k["best_day"]} ({k["best_day_mwh"]:.1f} MWh)', ""),
+        ("Ertrag", "Anteil Winterhalbjahr (Okt–Mär)", r(k["winter_share_pct"], 0), "%"),
+        ("Wind", f'Ø Windgeschwindigkeit Messhöhe ({k["h_ref"]:g} m)', r(k["v_ref_mean"], 2), "m/s"),
+        ("Wind", f'Ø Windgeschwindigkeit Nabenhöhe ({k["hub"]:g} m)', r(k["v_hub_mean"], 2), "m/s"),
+        ("Wind", "Höhenfaktor v(Nabe) / v(Messhöhe)", r(k["profile_factor"], 3), "-"),
+        ("Wind", "Hellmann-Exponent α", r(k["alpha"], 3), "-") if kind != "log" else None,
+        ("Wind", "Weibull-Formparameter k", r(k["weibull_k"], 2), "-"),
+        ("Wind", "Weibull-Skalenparameter A", r(k["weibull_a"], 2), "m/s"),
+        ("Wind", "Ø Windleistungsdichte (Nabenhöhe)", r(k["power_density"], 0), "W/m²"),
+        ("Wind", "Luftdichte", r(k["rho"], 3), "kg/m³"),
+        ("Windenergieanlage", "Nennleistung", r(k["p_nom_mw"], 2), "MW"),
+        ("Windenergieanlage", "Rotordurchmesser", r(k["d_rot"], 0), "m") if k["d_rot"] else None,
+        ("Windenergieanlage", "Gesamtwirkungsgrad (Strom / Wind-Energie)", r(k["eta_total_pct"], 1), "%") if k["eta_total_pct"] else None,
+        ("Windenergieanlage", "Einschaltgeschwindigkeit", r(k["v_in"], 1), "m/s"),
+        ("Windenergieanlage", "Nenngeschwindigkeit", r(k["v_rated"], 1), "m/s"),
+        ("Windenergieanlage", "Abschaltgeschwindigkeit", r(k["v_out"], 1), "m/s"),
+        ("Windenergieanlage", "Betriebsstunden", int(k["op_h"]), "h"),
+        ("Windenergieanlage", "Stunden bei Nennleistung", int(k["nom_h"]), "h"),
+        ("Windenergieanlage", "Stunden unter Einschaltgeschwindigkeit", int(k["calm_h"]), "h"),
+        ("Windenergieanlage", "Stunden über Abschaltgeschwindigkeit", int(k["cut_h"]), "h"),
+        ("Näherungen", "Ertrag aus Weibull-Verteilung", r(k["e_weibull_mwh"], 1), "MWh"),
+        ("Näherungen", "Ertrag aus Rayleigh-Verteilung", r(k["e_rayleigh_mwh"], 1), "MWh"),
+    ]
+    order = {"Wind": 0, "Windenergieanlage": 1, "Ertrag": 2, "Näherungen": 3}
+    return sorted((x for x in rows if x is not None), key=lambda x: order[x[0]])  # stabile Sortierung: Reihenfolge innerhalb der Gruppen bleibt
+
+
+# ----------------------------------------------------------------------------------------------
+# Downloads
+# ----------------------------------------------------------------------------------------------
+def get_csv(kind):
+    """kind: hourly | daily | monthly -> CSV (Semikolon, Dezimalkomma)."""
+    return _STATE["result"][kind].to_csv(sep=";", decimal=",", index=False)
+
+
+def get_xlsx():
+    r = _STATE["result"]
+    buf = io.BytesIO()
+    kpi = pd.DataFrame(r["kpi"], columns=["Gruppe", "Kennzahl", "Wert", "Einheit"])
+    inp = pd.DataFrame({"Parameter": list(r["inputs"].keys()), "Wert": [("" if v is None else v) for v in r["inputs"].values()]})
+    with pd.ExcelWriter(buf, engine="openpyxl") as xw:
+        inp.to_excel(xw, sheet_name="Eingaben", index=False)
+        kpi.to_excel(xw, sheet_name="Jahreswerte", index=False)
+        r["monthly"].to_excel(xw, sheet_name="Monatswerte", index=False)
+        r["daily"].to_excel(xw, sheet_name="Tageswerte", index=False)
+        r["hourly"].to_excel(xw, sheet_name="Stundenwerte", index=False)
+        for ws in xw.book.worksheets:
+            for c in ws.columns:
+                ws.column_dimensions[c[0].column_letter].width = min(46, max(12, len(str(c[0].value)) + 2))
+            ws.freeze_panes = "A2"
+    return buf.getvalue()
+
+</script>
+<script>
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const C = { ink: '#1a1a1a', ink2: '#52514e', muted: '#898781', grid: '#e1e0d9', axis: '#c3c2b7', line: '#e1e0d9',
+  blue: '#2a78d6', orange: '#eb6834', aqua: '#1baf7a', yellow: '#eda100', violet: '#6250d6', red: '#e34948' };
+
+let py = null, SITES = [], ANL = [], res = null, running = false, rerun = false, timer = null;
+const csvCache = new Map(), wxCache = new Map();
+let wxLoaded = null;           // Schlüssel der aktuell in Python geladenen Winddaten
+let activeTab = 'year';
+const dirty = new Set();
+const TABS = ['year', 'month', 'day', 'hour', 'curve', 'dist', 'dir', 'prof', 'heat'];
+
+/* Geländetypen mit typischen Rauhigkeitslängen */
+const TERRAINS = [
+  [0.0002, 'Wasserflächen: Meer und Seen'],
+  [0.0024, 'Offenes Gelände, glatte Oberfläche (Beton, Landebahn, gemähtes Gras)'],
+  [0.03, 'Offenes landwirtschaftliches Gelände ohne Zäune und Hecken'],
+  [0.055, 'Offenes Gelände mit einigen Häusern und 8 m hohen Hecken (> 1 km Abstand)'],
+  [0.1, 'Landwirtschaftliches Gelände mit vielen/hohen Hecken (ca. 500 m Abstand)'],
+  [0.2, 'Landwirtschaftliches Gelände mit Häusern, Büschen, Hecken (ca. 250 m)'],
+  [0.4, 'Dörfer, Kleinstädte, viele hohe Hecken, Wälder, raues Terrain'],
+  [0.6, 'Größere Städte mit hohen Wohngebäuden'],
+  [1.6, 'Großstädte mit hohen Gebäuden und Wolkenkratzern'],
+];
+/* Vorschlag für die Rauhigkeitslänge je Standort (änderbar) */
+const Z0_SUGGEST = { Generisch: 0.1, Berlin: 0.4, Hannover: 0.1, Soltau: 0.2, Cuxhaven: 0.03, Norderney: 0.03, Helgoland: 0.0002,
+  Kiel_Leuchtturm: 0.0002, Arkona: 0.03, Freiburg: 0.2, Feldberg: 0.1, Passau: 0.2, Nordsee_ERA5: 0.0002, Ostsee_ERA5: 0.0002 };
+
+/* ---------------- Hilfsfunktionen ---------------- */
+const fmt = (v, d = 0) => (v === null || v === undefined || Number.isNaN(v)) ? '–'
+  : Number(v).toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
+const fmtAuto = v => { const s = String(v); const d = Math.min(3, (s.split('.')[1] || '').length); return fmt(v, d); };
+const num = id => parseFloat($('#' + id).value);
+function setStatus(txt, kind = '') { const s = $('#status'); s.className = 'status ' + kind; $('#status-txt').textContent = txt; }
+function setOverlay(msg, pct) { $('#ov-msg').textContent = msg; $('#ov-bar').style.width = pct + '%'; }
+function download(name, data, type) {
+  const url = URL.createObjectURL(new Blob(data, { type }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: name });
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ---------------- Profilformeln (identisch zum Python-Modell) ---------------- */
+const hellmann = (hh, hr, z0) => 1 / Math.log(Math.sqrt(hh * hr) / z0);
+const profFactor = (hh, hr, z0, kind) => kind === 'log' ? Math.log(hh / z0) / Math.log(hr / z0) : Math.pow(hh / hr, hellmann(hh, hr, z0));
+
+/* ---------------- Anlagen-Skizze (SVG) ---------------- */
+function turbineSvg(hub, d, href) {
+  const G = 165, top = Math.max(hub + d / 2, href, 40), s = 138 / top, X = 150;
+  const hy = G - hub * s, R = (d / 2) * s;
+  const blade = ang => { const a = ang * Math.PI / 180, ux = Math.sin(a), uy = -Math.cos(a), px = -uy, py2 = ux;
+    const bx = X + ux * 4, by = hy + uy * 4, tx = X + ux * R, ty = hy + uy * R;
+    return `<path d="M ${bx + px * 3} ${by + py2 * 3} L ${tx} ${ty} L ${bx - px * 3} ${by - py2 * 3} Z" fill="#9ec5f4" stroke="${C.blue}" stroke-width="1.2" stroke-linejoin="round"/>`; };
+  const arrow = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${C.ink2}" stroke-width="1.2" marker-start="url(#wa)" marker-end="url(#wa)"/>`;
+  const mx = 262, mh = G - href * s;
+  return `<svg viewBox="0 0 300 190" role="img" aria-label="Skizze: Nabenhöhe ${hub} m, Rotordurchmesser ${d} m, Messhöhe ${href} m">
+    <defs><marker id="wa" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${C.ink2}"/></marker></defs>
+    <line x1="8" y1="${G}" x2="292" y2="${G}" stroke="${C.axis}" stroke-width="2"/>
+    <circle cx="${X}" cy="${hy}" r="${R}" fill="none" stroke="${C.muted}" stroke-width="1" stroke-dasharray="4 3"/>
+    <path d="M ${X - 5} ${G} L ${X - 2.5} ${hy} L ${X + 2.5} ${hy} L ${X + 5} ${G} Z" fill="#c9c8bf"/>
+    ${blade(0)}${blade(120)}${blade(240)}
+    <circle cx="${X}" cy="${hy}" r="4.5" fill="${C.ink2}"/>
+    ${arrow(34, G, 34, hy)}<line x1="30" y1="${hy}" x2="${X - 6}" y2="${hy}" stroke="${C.muted}" stroke-width="1" stroke-dasharray="2 3"/>
+    <text x="40" y="${(G + hy) / 2}" font-size="12" font-weight="600" fill="${C.orange}">H</text>
+    ${R > 10 ? arrow(X - R, hy - 7, X + R, hy - 7) + `<text x="${X}" y="${hy - 11}" text-anchor="middle" font-size="12" font-weight="600" fill="${C.orange}">D</text>` : ''}
+    <line x1="${mx}" y1="${G}" x2="${mx}" y2="${mh}" stroke="${C.muted}" stroke-width="2"/>
+    <circle cx="${mx}" cy="${mh}" r="3.5" fill="${C.aqua}"/><line x1="${mx - 9}" y1="${mh}" x2="${mx + 9}" y2="${mh}" stroke="${C.aqua}" stroke-width="2"/>
+    <text x="${mx}" y="${mh - 8}" text-anchor="middle" font-size="11" font-weight="600" fill="${C.aqua}">h<tspan font-size="8" dy="2">ref</tspan></text>
+    <path d="M 8 ${G - 22} h 26" stroke="${C.ink2}" stroke-width="1.6" marker-end="url(#wa)"/><text x="8" y="${G - 27}" font-size="10" fill="${C.muted}">Wind</text>
+  </svg>`;
+}
+function updateSketch() {
+  const h = num('hub') || 100, d = num('rotor') || 0, r = num('href') || 10;
+  const hr = $('#use100').checked ? 100 : r;
+  $('#svg-turbine').innerHTML = turbineSvg(Math.max(h, 1), Math.max(d, 0), hr);
+  $('#cap-turbine').innerHTML = `Nabenhöhe <b>H = ${fmt(h)} m</b> · Rotor <b>D = ${fmt(d)} m</b> · Messhöhe <b>h<sub>ref</sub> = ${fmt(hr)} m</b>`;
+}
+
+/* ---------------- Daten laden ---------------- */
+function loadScript(src) {
+  return new Promise((ok, rej) => {
+    const el = document.createElement('script'); el.src = src;
+    el.onload = ok; el.onerror = () => rej(new Error('Datei nicht ladbar: ' + src));
+    document.head.appendChild(el);
+  });
+}
+async function getData() {
+  if (!window.WIND_STANDORTE) await loadScript('data/standorte.js');
+  if (!window.WIND_ANLAGEN) await loadScript('data/anlagen.js');
+  return [window.WIND_STANDORTE, window.WIND_ANLAGEN];
+}
+async function getCsv(s) {
+  if (!(window.WIND_CSV && window.WIND_CSV[s.file])) await loadScript(s.file.replace(/\.csv$/, '.js'));
+  return window.WIND_CSV[s.file];
+}
+
+/* ---------------- Eingaben ---------------- */
+const curType = () => ANL.find(a => a.id === $('#type').value);
+function applyType(keepHub = false) {
+  const a = curType(); if (!a) return;
+  const gen = a.normalized;
+  $('#pn').value = a.p_nom_mw; $('#rotor').value = a.rotor_d;
+  $('#pn').disabled = !gen; $('#rotor').disabled = !gen;
+  if (!keepHub) { $('#hub').value = a.hub_default; $('#hub-r').value = a.hub_default; }
+  $('#hub-hint').textContent = a.hubs && a.hubs.length ? `Herstellerangaben: Nabenhöhen ${a.hubs.map(x => fmt(x, x % 1 ? 1 : 0)).join(' / ')} m` : '';
+  $('#type-hint').textContent = (a.note || '').replace(/\.?$/, '.') + (a.extended_to_25 ? ' Die Herstellerkurve endet vor 25 m/s; sie wird bis 25 m/s auf Nennleistung fortgesetzt.' : '');
+  updateSketch();
+}
+function syncTerrain() {
+  const z = num('z0'); const sel = $('#terrain');
+  const hit = TERRAINS.find(t => Math.abs(t[0] - z) < 1e-9);
+  sel.value = hit ? String(hit[0]) : 'custom';
+}
+function readParams() {
+  const errs = [];
+  const chk = (id, lo, hi, label) => { const el = $('#' + id), v = parseFloat(el.value);
+    const ok = Number.isFinite(v) && v >= lo && v <= hi; el.classList.toggle('bad', !ok); if (!ok) errs.push(`${label}: ${lo} … ${hi}`); return v; };
+  const a = curType(); const use100 = $('#use100').checked && !$('#box100').hidden;
+  const pn = chk('pn', 0.05, 30, 'Nennleistung'), rotor = chk('rotor', 5, 300, 'Rotordurchmesser');
+  const p = {
+    hub: chk('hub', 10, 300, 'Nabenhöhe'), z0: chk('z0', 0.0001, 1.6, 'Rauhigkeitslänge'),
+    profile: $('input[name=prof]:checked').value, h_ref: use100 ? 100 : chk('href', 1, 200, 'Messhöhe'), use100,
+    density: $('#density').checked, loss_pct: chk('loss', 0, 50, 'Verluste'),
+    p_nom_mw: pn, rotor_d: rotor, curve_name: a.name,
+    curve: { v: a.v, p: a.normalized ? a.p.map(x => x * pn) : a.p },
+  };
+  return { p, errs };
+}
+
+/* ---------------- Standorte & Winddaten ---------------- */
+async function loadSource() {
+  const val = $('#src').value, custom = val === 'custom';
+  $('#custom-box').hidden = !custom;
+  if (custom) {
+    $('#box100').hidden = false; $('#src-hint').textContent = 'Eigener Standort: stündliche ERA5-Reanalyse über Open-Meteo (kostenlos, ohne API-Key). Rasterdaten glätten das Relief; für Gipfel- und Küstenlagen sind Messungen besser. Bitte Gelände (Rauhigkeitslänge) und Anlage passend zum Ort einstellen.';
+    $('#data-note').textContent = '';
+    if (wxLoaded && wxLoaded.startsWith('om:')) { $('#href').value = 10; return scheduleRun(); }
+    $('#wx-hint').textContent = 'Koordinaten eingeben bzw. Ort suchen, dann „Winddaten abrufen“.';
+    return;
+  }
+  const s = SITES.find(x => x.slug === val);
+  $('#href').value = s.h_ref; $('#box100').hidden = !s.has100; if (!s.has100) $('#use100').checked = false;
+  if (Z0_SUGGEST[s.slug] != null) { $('#z0').value = Z0_SUGGEST[s.slug]; syncTerrain(); }
+  $('#href').disabled = false; updateSketch();
+  const gaps = s.filled_hours > 0 ? ` Datenlücken: ${fmt(s.filled_hours)} Stunden (längste ${fmt(s.longest_gap_h)} h) linear interpoliert.` : '';
+  $('#src-hint').textContent = `${s.note}. Messhöhe laut Stationsmetadaten: ${fmt(s.h_ref, 1)} m.${s.has100 ? ' ERA5 liefert zusätzlich Wind in 100 m.' : ''} Rauhigkeitslänge auf Vorschlag gesetzt (änderbar).`;
+  $('#data-note').textContent = `Datenquelle: ${s.source}.${gaps}`;
+  setStatus(`Lade Winddaten ${s.name} …`, 'busy');
+  try {
+    const txt = await getCsv(s);
+    py.globals.get('load_csv')(txt, JSON.stringify({ name: s.name, lat: s.lat, lon: s.lon, altitude: s.altitude, source: s.source,
+      year: s.year, year_label: String(s.year), filled_hours: s.filled_hours, h_ref: s.h_ref }));
+    wxLoaded = 'csv:' + s.slug; scheduleRun(0);
+  } catch (e) { fail(e, 'Die Datendatei konnte nicht geladen werden. Liegt der Ordner „data“ neben der HTML-Datei? Alternativ wind_sim_standalone.html verwenden.'); }
+}
+async function fetchOpenMeteo() {
+  const lat = num('lat'), lon = num('lon'), year = $('#wx-year').value;
+  if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) { $('#wx-hint').textContent = 'Bitte gültige Koordinaten eingeben.'; $('#wx-hint').className = 'hint err'; return; }
+  const key = `om:${lat.toFixed(3)},${lon.toFixed(3)},${year}`;
+  $('#wx-hint').className = 'hint'; $('#wx-hint').textContent = 'Rufe Open-Meteo ab …'; $('#wx-fetch').disabled = true;
+  setStatus('Rufe Winddaten von Open-Meteo ab …', 'busy');
+  try {
+    let txt = wxCache.get(key);
+    if (!txt) {
+      const u = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${year}-01-01&end_date=${year}-12-31`
+        + `&hourly=wind_speed_10m,wind_direction_10m,wind_speed_100m,wind_direction_100m&wind_speed_unit=ms&timezone=GMT`;
+      const r = await fetch(u); const t = await r.text();
+      if (!r.ok) throw new Error('Open-Meteo: ' + (JSON.parse(t).reason || r.status));
+      txt = t; wxCache.set(key, txt);
+    }
+    const elev = JSON.parse(txt).elevation ?? 0;
+    const n = py.globals.get('load_openmeteo')(txt, JSON.stringify({ name: `Eigener Standort (${lat.toFixed(3)}, ${lon.toFixed(3)})`, lat, lon, altitude: elev,
+      source: 'ERA5-Reanalyse (Copernicus/ECMWF) über Open-Meteo', year_label: String(year), filled_hours: 0, h_ref: 10 }));
+    wxLoaded = key; $('#href').value = 10; $('#wx-hint').textContent = `Geladen: ${fmt(n)} Stunden, Jahr ${year} (Geländehöhe im Modell ${fmt(elev)} m).`;
+    $('#data-note').textContent = 'Datenquelle: ERA5-Reanalyse (Copernicus/ECMWF) über Open-Meteo, CC BY 4.0.'; updateSketch(); scheduleRun(0);
+  } catch (e) { $('#wx-hint').className = 'hint err'; $('#wx-hint').textContent = String(e.message || e); fail(e); }
+  finally { $('#wx-fetch').disabled = false; }
+}
+async function geocode() {
+  const q = $('#geo-q').value.trim(); if (!q) return;
+  const box = $('#geo-res'); box.textContent = 'Suche …';
+  try {
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=de&format=json`);
+    const j = await r.json(); box.innerHTML = '';
+    if (!j.results) { box.textContent = 'Kein Treffer.'; return; }
+    j.results.forEach(o => { const b = document.createElement('button'); b.type = 'button';
+      b.textContent = `${o.name}${o.admin1 ? ', ' + o.admin1 : ''}, ${o.country || ''} (${o.latitude.toFixed(3)}, ${o.longitude.toFixed(3)})`;
+      b.onclick = () => { $('#lat').value = o.latitude.toFixed(4); $('#lon').value = o.longitude.toFixed(4); box.innerHTML = '';
+        $('#wx-hint').textContent = 'Koordinaten übernommen – jetzt „Winddaten abrufen“.'; $('#wx-hint').className = 'hint'; };
+      box.appendChild(b); });
+  } catch (e) { box.textContent = 'Suche fehlgeschlagen: ' + e.message; }
+}
+
+/* ---------------- Rechnen ---------------- */
+function scheduleRun(delay = 220) { clearTimeout(timer); timer = setTimeout(run, delay); }
+async function run() {
+  if (!py || !wxLoaded) return;
+  if (running) { rerun = true; return; }
+  const { p, errs } = readParams();
+  if (errs.length) { setStatus('Bitte Eingaben prüfen – ' + errs.join(' · '), 'err'); return; }
+  if ($('#src').value === 'custom' && !wxLoaded.startsWith('om:')) { setStatus('Bitte zuerst Winddaten abrufen.', 'err'); return; }
+  const hint = $('#prof-hint'); hint.className = 'hint';
+  hint.textContent = (p.profile === 'log' && p.hub > 100) ? 'Hinweis: Das logarithmische Profil ist bei Nabenhöhen über 100 m nicht zu empfehlen.' : '';
+  if (hint.textContent) hint.className = 'hint warn';
+  running = true; setStatus('Berechne …', 'busy');
+  await new Promise(r => setTimeout(r, 15));
+  try {
+    const t0 = performance.now();
+    res = JSON.parse(py.globals.get('simulate')(JSON.stringify(p)));
+    const y0 = res.daily.dates[0].slice(0, 4); if (!$('#h-start').value.startsWith(y0)) $('#h-start').value = y0 + '-01-06';
+    setStatus(`Berechnet in ${fmt((performance.now() - t0) / 1000, 2)} s · ${fmt(res.kpi.hours)} Stunden · ${res.kpi.source}`, '');
+    $$('[data-csv], #dl-xlsx, #dl-kpi').forEach(b => b.disabled = false);
+    renderTiles(); TABS.forEach(t => dirty.add(t)); renderTab(activeTab);
+  } catch (e) { fail(e); }
+  finally { running = false; if (rerun) { rerun = false; scheduleRun(0); } }
+}
+function fail(e, extra = '') {
+  console.error(e); const m = String(e.message || e).split('\n').filter(Boolean).slice(-1)[0];
+  setStatus('Fehler: ' + m + (extra ? ' – ' + extra : ''), 'err');
+}
+
+/* ---------------- Darstellung ---------------- */
+function renderTiles() {
+  const k = res.kpi;
+  const T = (kk, v, u, s) => `<div class="tile"><div class="k">${kk}</div><div class="v">${v}<small>${u}</small></div><div class="s">${s}</div></div>`;
+  $('#tiles').innerHTML =
+    T('Jahresertrag', fmt(k.yield_mwh), 'MWh', `bei ${fmt(k.p_nom_mw, 2)} MW Nennleistung`) +
+    T('Volllaststunden', fmt(k.flh), 'h', `Auslastungsfaktor ${fmt(k.cf, 1)} %`) +
+    T('Ø Windgeschwindigkeit', fmt(k.v_hub_mean, 2), 'm/s', `Nabenhöhe ${fmt(k.hub)} m · Messhöhe ${fmt(k.h_ref, 1)} m: ${fmt(k.v_ref_mean, 2)} m/s`) +
+    T('Betriebsstunden', fmt(k.op_h), 'h', `${fmt(k.op_h / k.hours * 100, 0)} % des Jahres · ${fmt(k.nom_h)} h bei Nennleistung`);
+}
+function table(el, cols, rows, decs) {
+  const th = cols.map(c => `<th>${c.trim()}</th>`).join('');
+  const body = rows.map(r => '<tr>' + r.map((v, i) => `<td>${typeof v === 'number' ? fmt(v, decs[i] ?? 1) : (v ?? '–')}</td>`).join('') + '</tr>').join('');
+  el.innerHTML = `<table class="data"><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table>`;
+}
+const CFG = { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] };
+function baseLayout(extra = {}) {
+  return Object.assign({
+    font: { family: 'system-ui,-apple-system,"Segoe UI",sans-serif', size: 12, color: C.ink2 },
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', separators: ',.',
+    margin: { l: 66, r: 14, t: 34, b: 50 },
+    hoverlabel: { bgcolor: '#fff', bordercolor: C.axis, font: { color: C.ink, size: 12 } },
+    legend: { orientation: 'h', x: 0, y: 1.14, font: { color: C.ink2 } },
+    xaxis: { gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, zeroline: false },
+    yaxis: { gridcolor: C.grid, linecolor: 'rgba(0,0,0,0)', tickfont: { color: C.ink2 }, zeroline: false, title: { font: { color: C.ink2 } } },
+  }, extra);
+}
+const ax = (dom, title, extra = {}) => Object.assign({ domain: dom, gridcolor: C.grid, linecolor: 'rgba(0,0,0,0)', zeroline: false, tickfont: { color: C.ink2 }, title: { text: title, font: { color: C.ink2 } } }, extra);
+const bar = (x, y, name, color, unit, d = 1, extra = {}) => Object.assign({
+  type: 'bar', x, y, name, marker: { color }, hovertemplate: `%{x}<br><b>%{y:,.${d}f}</b> ${unit}<extra>${name}</extra>` }, extra);
+const MN = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+
+let theoryDone = false;
+function renderTheory(tries = 0) {   // Formeln (KaTeX) einmalig setzen; KaTeX lädt asynchron vom CDN
+  if (theoryDone) return;
+  if (!window.renderMathInElement) { if (tries < 40) setTimeout(() => renderTheory(tries + 1), 250); return; }
+  renderMathInElement($('#p-theory'), { delimiters: [{ left: '\\[', right: '\\]', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false });
+  theoryDone = true;
+}
+function vline(x, label, color = C.muted) {
+  return { shape: { type: 'line', xref: 'x', yref: 'paper', x0: x, x1: x, y0: 0, y1: 1, line: { color, width: 1, dash: 'dot' } },
+    ann: { x, xref: 'x', y: 1, yref: 'paper', text: label, showarrow: false, yanchor: 'top', xanchor: 'left', xshift: 4, font: { size: 11, color: C.ink2 } } };
+}
+function polar(title, unit) {
+  return { polar: { bgcolor: 'rgba(0,0,0,0)', angularaxis: { direction: 'clockwise', rotation: 90, tickmode: 'array', tickvals: [0, 45, 90, 135, 180, 225, 270, 315],
+    ticktext: ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'], gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 } },
+    radialaxis: { gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2, size: 10 }, ticksuffix: ' ' + unit, angle: 90 } } };
+}
+function renderTab(t) {
+  if (t === 'theory') return renderTheory();
+  if (!res || !dirty.has(t)) return; dirty.delete(t);
+  const k = res.kpi, tb = res.tables;
+  if (t === 'year') {
+    $('#year-sub').textContent = `${k.source} · ${k.year_label}`;
+    const groups = {}; res.kpi_rows.forEach(r => (groups[r[0]] ||= []).push(r));
+    $('#kpi-groups').innerHTML = Object.entries(groups).map(([g, rows]) => `<div class="kpi-group"><h3>${g}</h3><table>` +
+      rows.map(r => `<tr><td>${r[1]}</td><td class="n">${typeof r[2] === 'number' ? fmtAuto(r[2]) : r[2]}</td><td class="u">${r[3]}</td></tr>`).join('') + '</table></div>').join('');
+    const lg = $('input[name=prof]:checked').value === 'log';
+    $('#methods').innerHTML = [
+      `Winddaten: ${k.source}; Stundenmittelwerte in ${fmt(k.h_ref, 1)} m Höhe, Zeitstempel in UTC.`,
+      lg ? `Höhenprofil: logarithmisch, v(h) = v(h<sub>ref</sub>)·ln(h/z<sub>0</sub>)/ln(h<sub>ref</sub>/z<sub>0</sub>) mit z<sub>0</sub> = ${fmt(k.z0, 4)} m (Faktor ${fmt(k.profile_factor, 3)}).`
+         : `Höhenprofil: Hellmann, v(h) = v(h<sub>ref</sub>)·(h/h<sub>ref</sub>)<sup>α</sup> mit α = 1/ln(√(h·h<sub>ref</sub>)/z<sub>0</sub>) = ${fmt(k.alpha, 3)} (z<sub>0</sub> = ${fmt(k.z0, 4)} m, Faktor ${fmt(k.profile_factor, 3)}).`,
+      'Leistung: lineare Interpolation der Leistungskennlinie; Stundenmittel [kW] × 1 h = Ertrag [kWh]. Außerhalb der Kennlinie (unter Einschalt-, über Abschaltgeschwindigkeit) ist die Leistung 0.',
+      `Luftdichte ρ = ${fmt(k.rho, 3)} kg/m³ (${$('#density').checked ? 'Standardatmosphäre, korrigiert' : 'Normdichte, keine Korrektur'}).`,
+      'Tages- und Monatswerte werden in UTC aggregiert.',
+    ].map(s => `<li>${s}</li>`).join('');
+  }
+  if (t === 'month' || t === 'day') {
+    const d = t === 'month' ? res.monthly : res.daily, x = t === 'month' ? d.labels : d.dates, v = $('#' + t + '-metric').value;
+    const L = baseLayout(t === 'month' ? { barmode: 'group', bargap: .3 } : { barmode: 'group', bargap: .15 });
+    let tr, dd = t === 'month' ? 0 : 1;
+    if (v === 'yield') { tr = [bar(x, d.yield_mwh, 'Stromertrag', C.blue, 'MWh', t === 'month' ? 1 : 2)]; L.yaxis.title.text = 'Stromertrag [MWh]'; }
+    if (v === 'flh') { tr = [bar(x, d.flh, 'Volllaststunden', C.blue, 'h', t === 'month' ? 0 : 1)]; L.yaxis.title.text = 'Volllaststunden [h]'; }
+    if (v === 'cf') { tr = [bar(x, d.cf, 'Auslastungsfaktor', C.blue, '%', 1)]; L.yaxis.title.text = 'Auslastungsfaktor [%]'; }
+    if (v === 'op') { tr = [bar(x, d.op_h, 'Betriebsstunden', C.blue, 'h', 0)]; L.yaxis.title.text = 'Betriebsstunden [h]'; }
+    if (v === 'wind') {
+      tr = t === 'month' ? [bar(x, d.v_ref, `Messhöhe (${fmt(k.h_ref, 1)} m)`, C.muted, 'm/s', 2), bar(x, d.v_hub, `Nabenhöhe (${fmt(k.hub)} m)`, C.orange, 'm/s', 2)]
+        : [bar(x, d.v_hub, 'Nabenhöhe', C.orange, 'm/s', 2)];
+      L.yaxis.title.text = 'Ø Windgeschwindigkeit [m/s]'; }
+    L.showlegend = tr.length > 1; L.yaxis.rangemode = 'tozero';
+    if (t === 'day') {
+      L.xaxis.rangeslider = { visible: true, thickness: .07 }; L.xaxis.type = 'date';
+      L.xaxis.rangeselector = { buttons: [{ count: 1, label: '1 M', step: 'month', stepmode: 'backward' }, { count: 3, label: '3 M', step: 'month', stepmode: 'backward' },
+        { count: 6, label: '6 M', step: 'month', stepmode: 'backward' }, { step: 'all', label: 'Jahr' }], font: { color: C.ink2 }, bgcolor: '#fafafa', activecolor: '#e8f1fc' };
+      L.margin.b = 40;
+    }
+    Plotly.react('chart-' + t, tr, L, CFG);
+    if (t === 'month') table($('#tbl-month'), tb.monthly_cols, tb.monthly_rows, [0, 2, 2, 1, 1, 0, 1, 0]);
+    else table($('#tbl-day'), tb.daily_cols, tb.daily_rows, [0, 2, 2, 1, 1, 0]);
+  }
+  if (t === 'hour') {
+    const h = res.hourly, x = h.t;
+    const tr = [
+      { type: 'scatter', mode: 'lines', x, y: h.p_kw, name: 'Leistung', xaxis: 'x', yaxis: 'y', line: { color: C.blue, width: 1.4 }, fill: 'tozeroy', fillcolor: 'rgba(42,120,214,.16)', hovertemplate: '%{y:,.0f} kW<extra>Leistung</extra>' },
+      { type: 'scatter', mode: 'lines', x, y: h.v_hub, name: `Windgeschwindigkeit Nabenhöhe (${fmt(k.hub)} m)`, xaxis: 'x2', yaxis: 'y2', line: { color: C.orange, width: 1.4 }, hovertemplate: '%{y:,.1f} m/s<extra>Nabenhöhe</extra>' },
+      { type: 'scatter', mode: 'lines', x, y: h.v_ref, name: `Windgeschwindigkeit Messhöhe (${fmt(k.h_ref, 1)} m)`, xaxis: 'x2', yaxis: 'y2', line: { color: C.muted, width: 1.2 }, hovertemplate: '%{y:,.1f} m/s<extra>Messhöhe</extra>' },
+      { type: 'scatter', mode: 'markers', x, y: h.wd, name: 'Windrichtung', xaxis: 'x3', yaxis: 'y3', marker: { color: C.violet, size: 3 }, hovertemplate: '%{y:.0f}°<extra>Windrichtung</extra>' },
+    ];
+    const L = baseLayout({ hovermode: 'x unified', margin: { l: 70, r: 14, t: 34, b: 40 },
+      xaxis: { anchor: 'y', matches: 'x3', showticklabels: false, gridcolor: C.grid, linecolor: C.axis },
+      xaxis2: { anchor: 'y2', matches: 'x3', showticklabels: false, gridcolor: C.grid, linecolor: C.axis },
+      xaxis3: { anchor: 'y3', type: 'date', gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, title: { text: 'Zeit (UTC)', font: { color: C.ink2 } }, rangeslider: { visible: true, thickness: .06 } },
+      yaxis: ax([.72, 1], 'Leistung [kW]', { rangemode: 'tozero' }), yaxis2: ax([.38, .66], 'Wind [m/s]', { rangemode: 'tozero' }),
+      yaxis3: ax([.08, .32], 'Richtung [°]', { range: [0, 360], tickvals: [0, 90, 180, 270, 360], ticktext: ['N', 'O', 'S', 'W', 'N'] }) });
+    L.legend = { orientation: 'h', x: 0, y: 1.07, font: { color: C.ink2 } };
+    setHourRange(L);
+    Plotly.react('chart-hour', tr, L, CFG);
+    table($('#tbl-hour'), tb.hourly_cols, tb.hourly_preview, tb.hourly_cols.map((_, i) => i === 0 ? 0 : 1));
+    $('#hour-note').textContent = `Vorschau: erste ${tb.hourly_preview.length} von ${fmt(k.hours)} Stunden – der CSV-/Excel-Download enthält alle Stunden.`;
+  }
+  if (t === 'curve') {
+    const c = res.curve, vmaxAx = Math.max(30, Math.ceil(c.v_out) + 2), hasCp = !!c.cp;
+    $('#curve-note').innerHTML = `Einschaltgeschwindigkeit ${fmt(c.v_in, 1)} m/s · Nenngeschwindigkeit ${fmt(c.v_rated, 1)} m/s · Abschaltgeschwindigkeit ${fmt(c.v_out, 1)} m/s · ${res.kpi.p_nom_mw ? 'Nennleistung ' + fmt(res.kpi.p_nom_mw, 2) + ' MW' : ''}. Leistungsbeiwert c<sub>P</sub> = P / P₀ mit der Leistung des Windes P₀ = ½ρAv³ (= ½ṁv², ṁ = ρAv). P₀ steigt mit v³ und verlässt das Diagramm; die Anlage nutzt davon höchstens den Betz-Anteil.`;
+    const lines = [vline(c.v_in, 'v min'), vline(c.v_rated, 'v Nenn'), vline(c.v_out, 'v max')];
+    const hr = res.hourly;
+    const tr = [];
+    if (c.pw_kw) {
+      tr.push({ type: 'scatter', mode: 'lines', x: c.v, y: c.pw_kw, name: 'Leistung des Windes P₀ = ½ρAv³', xaxis: 'x', yaxis: 'y', line: { color: C.orange, width: 2 },
+        hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.0f}</b> kW<extra>Windleistung</extra>' });
+      tr.push({ type: 'scatter', mode: 'lines', x: c.v, y: c.betz_kw, name: 'Betz-Grenze (16/27 · P₀)', xaxis: 'x', yaxis: 'y', line: { color: C.red, width: 1.6, dash: 'dash' },
+        hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.0f}</b> kW<extra>Betz-Grenze</extra>' });
+    }
+    tr.push({ type: 'scatter', mode: 'lines', x: c.v, y: c.p_kw, name: 'Leistungskurve der Anlage', xaxis: 'x', yaxis: 'y', line: { color: C.blue, width: 2.4 },
+      hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.0f}</b> kW<extra>Leistungskurve</extra>' });
+    const L = baseLayout({ margin: { l: 70, r: 14, t: 110, b: 50 }, showlegend: true,
+      xaxis: { anchor: hasCp ? 'y2' : 'y', range: [0, vmaxAx], gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, title: { text: 'Windgeschwindigkeit in Nabenhöhe [m/s]', font: { color: C.ink2 } } },
+      yaxis: ax(hasCp ? [.4, 1] : [0, 1], 'Leistung [kW]', { range: [0, 1.5 * c.p_nom_kw] }) });
+    L.legend = { orientation: 'h', x: 0, y: 1.02, yanchor: 'bottom', font: { color: C.ink2 } };
+    if (hasCp) {
+      tr.push({ type: 'scatter', mode: 'lines', x: c.v, y: c.cp, name: 'Leistungsbeiwert', showlegend: false, xaxis: 'x', yaxis: 'y2', line: { color: C.orange, width: 2 }, hovertemplate: '%{x:.1f} m/s<br><b>c<sub>P</sub> = %{y:.3f}</b><extra></extra>' });
+      L.yaxis2 = ax([0, .3], 'Leistungsbeiwert c<sub>P</sub> [–]', { range: [0, 0.7], dtick: 0.2 });
+    }
+    L.shapes = lines.map(l => l.shape); L.annotations = lines.map(l => l.ann);
+    if (hasCp) {
+      L.shapes.push({ type: 'line', xref: 'x', yref: 'y2', x0: 0, x1: vmaxAx, y0: 16 / 27, y1: 16 / 27, line: { color: C.red, width: 1.2, dash: 'dash' } });
+      L.annotations.push({ x: vmaxAx, xref: 'x', y: 16 / 27, yref: 'y2', text: 'Betz-Grenze 0,593', showarrow: false, xanchor: 'right', yanchor: 'bottom', font: { size: 11, color: C.red } });
+    }
+    Plotly.react('chart-curve', tr, L, CFG);
+    // Leistungskurve + Histogramm + Ertrag je Klasse
+    const d = res.dist, cx = d.edges.slice(0, -1).map(e => e + 0.5);
+    const tr2 = [
+      { type: 'bar', x: cx, y: d.hours, name: 'Häufigkeit', xaxis: 'x', yaxis: 'y', marker: { color: C.orange }, width: 0.9, hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.0f}</b> h<extra>Häufigkeit</extra>' },
+      { type: 'scatter', mode: 'markers', x: hr.v_hub, y: hr.p_kw, name: 'Stundenwerte', xaxis: 'x2', yaxis: 'y2',
+        marker: { color: C.aqua, size: 5, opacity: .35 }, hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.0f}</b> kW<extra>Stunde</extra>' },
+      { type: 'scatter', mode: 'lines', x: c.v, y: c.p_kw, name: 'Leistung', xaxis: 'x2', yaxis: 'y2', line: { color: C.blue, width: 2 }, hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.0f}</b> kW<extra>Leistung</extra>' },
+      { type: 'bar', x: cx, y: d.yield_mwh, name: 'Ertrag', xaxis: 'x3', yaxis: 'y3', marker: { color: C.aqua }, width: 0.9, hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.1f}</b> MWh<extra>Ertrag</extra>' },
+    ];
+    const L2 = baseLayout({ margin: { l: 74, r: 14, t: 18, b: 50 }, showlegend: false,
+      xaxis: { anchor: 'y', range: [0, vmaxAx], matches: 'x3', showticklabels: false, gridcolor: C.grid, linecolor: C.axis },
+      xaxis2: { anchor: 'y2', range: [0, vmaxAx], matches: 'x3', showticklabels: false, gridcolor: C.grid, linecolor: C.axis },
+      xaxis3: { anchor: 'y3', range: [0, vmaxAx], gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, title: { text: 'Windgeschwindigkeit in Nabenhöhe [m/s]', font: { color: C.ink2 } } },
+      yaxis: ax([.72, 1], 'Häufigkeit [h/Jahr]', { rangemode: 'tozero' }), yaxis2: ax([.38, .66], 'Leistung [kW]', { rangemode: 'tozero' }),
+      yaxis3: ax([0, .3], 'Ertrag [MWh]', { rangemode: 'tozero' }) });
+    Plotly.react('chart-curve-hist', tr2, L2, CFG);
+  }
+  if (t === 'dist') {
+    const d = res.dist, cx = d.edges.slice(0, -1).map(e => e + 0.5);
+    $('#dist-note').innerHTML = `Weibull: k = ${fmt(k.weibull_k, 2)}, A = ${fmt(k.weibull_a, 2)} m/s · Ø v = ${fmt(k.v_hub_mean, 2)} m/s · Ertrag aus Weibull ${fmt(k.e_weibull_mwh)} MWh, aus Rayleigh ${fmt(k.e_rayleigh_mwh)} MWh, aus Zeitreihe ${fmt(k.yield_mwh)} MWh.`;
+    const tr = [
+      { type: 'bar', x: cx, y: d.hours, name: 'Zeitreihe (Histogramm)', marker: { color: C.blue }, width: 0.9, hovertemplate: '%{x:.1f} m/s<br><b>%{y:,.0f}</b> h<extra>Zeitreihe</extra>' },
+      { type: 'scatter', mode: 'lines', x: cx, y: d.fit_weibull, name: `Weibull (k = ${fmt(k.weibull_k, 2)}, A = ${fmt(k.weibull_a, 2)} m/s)`, line: { color: C.orange, width: 2.2 }, hovertemplate: '%{y:,.0f} h<extra>Weibull</extra>' },
+      { type: 'scatter', mode: 'lines', x: cx, y: d.fit_rayleigh, name: 'Rayleigh (k = 2)', line: { color: C.violet, width: 2, dash: 'dash' }, hovertemplate: '%{y:,.0f} h<extra>Rayleigh</extra>' },
+    ];
+    const L = baseLayout({ margin: { l: 70, r: 14, t: 34, b: 50 }, xaxis: { range: [0, Math.max(...d.edges.slice(0, -1).filter((e, i) => d.hours[i] > 0)) + 2], gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, title: { text: 'Windgeschwindigkeit in Nabenhöhe [m/s]', font: { color: C.ink2 } } } });
+    L.yaxis.title.text = 'Stunden pro Jahr [h] je Klasse (1 m/s)'; L.yaxis.rangemode = 'tozero'; L.hovermode = 'x unified';
+    Plotly.react('chart-dist', tr, L, CFG);
+    const du = res.duration, xs = du.map((_, i) => i + 1);
+    const L2 = baseLayout({ margin: { l: 70, r: 14, t: 18, b: 50 }, showlegend: false, xaxis: { gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, title: { text: 'Stunden des Jahres (sortiert)', font: { color: C.ink2 } } } });
+    L2.yaxis.title.text = 'Leistung [kW]'; L2.yaxis.rangemode = 'tozero';
+    Plotly.react('chart-dur', [{ type: 'scatter', mode: 'lines', x: xs, y: du, line: { color: C.blue, width: 2 }, fill: 'tozeroy', fillcolor: 'rgba(42,120,214,.16)', hovertemplate: 'Stunde %{x:,.0f}<br><b>%{y:,.0f}</b> kW<extra></extra>' }], L2, CFG);
+  }
+  if (t === 'dir') {
+    const d = res.dir, base = (unit, title) => Object.assign(baseLayout({ margin: { l: 30, r: 30, t: 20, b: 30 }, showlegend: false }), polar(title, unit));
+    const bp = (r, color, unit, dd) => [{ type: 'barpolar', theta: d.sectors, r, width: 10, marker: { color, line: { color: '#fff', width: 1 } }, hovertemplate: `%{theta}°<br><b>%{r:,.${dd}f}</b> ${unit}<extra></extra>` }];
+    Plotly.react('chart-dir-share', bp(d.share, C.blue, '%', 1), base('%', ''), CFG);
+    Plotly.react('chart-dir-v', bp(d.v, C.orange, 'm/s', 2), base('m/s', ''), CFG);
+    Plotly.react('chart-dir-e', bp(d.yield_mwh, C.aqua, 'MWh', 1), base('MWh', ''), CFG);
+  }
+  if (t === 'prof') {
+    const p = res.profile, kind = $('input[name=prof]:checked').value, sel = kind === 'log' ? 'log' : 'exp';
+    $('#prof-note').textContent = `Mittlere Windgeschwindigkeit in ${fmt(p.h_ref, 1)} m: ${fmt(p.v_ref, 2)} m/s → in ${fmt(p.hub)} m (Nabenhöhe): ${fmt(p.v_ref * profFactor(p.hub, p.h_ref, k.z0, kind), 2)} m/s (z₀ = ${fmt(k.z0, 4)} m).`;
+    const tr = [
+      { type: 'scatter', mode: 'lines', x: p.exp, y: p.h, name: 'Exponentiell (Hellmann)', line: { color: C.orange, width: sel === 'exp' ? 2.6 : 1.6, dash: sel === 'exp' ? 'solid' : 'dot' }, hovertemplate: '%{y:.0f} m: <b>%{x:.2f}</b> m/s<extra>Hellmann</extra>' },
+      { type: 'scatter', mode: 'lines', x: p.log, y: p.h, name: 'Logarithmisch', line: { color: C.blue, width: sel === 'log' ? 2.6 : 1.6, dash: sel === 'log' ? 'solid' : 'dot' }, hovertemplate: '%{y:.0f} m: <b>%{x:.2f}</b> m/s<extra>Logarithmisch</extra>' },
+      { type: 'scatter', mode: 'markers+text', x: [p.v_ref, p.v_ref * profFactor(p.hub, p.h_ref, k.z0, kind)], y: [p.h_ref, p.hub], text: ['Messhöhe', 'Nabenhöhe'], textposition: ['middle right', 'middle right'],
+        marker: { size: 9, color: [C.aqua, C.ink], line: { color: '#fff', width: 1.5 } }, showlegend: false, hoverinfo: 'skip', textfont: { color: C.ink2 } },
+    ];
+    const L = baseLayout({ margin: { l: 64, r: 14, t: 34, b: 50 }, xaxis: { gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, rangemode: 'tozero', title: { text: 'Windgeschwindigkeit [m/s]', font: { color: C.ink2 } } } });
+    L.yaxis.title.text = 'Höhe über Grund [m]'; L.yaxis.range = [0, 250];
+    Plotly.react('chart-prof', tr, L, CFG);
+    const cols = [C.blue, C.orange, C.aqua, C.yellow, C.violet, C.red];
+    const zs = [0.0002, 0.03, 0.1, 0.4, 1.6].filter(z => z < p.h_ref);
+    const tr2 = zs.map((z, i) => ({ type: 'scatter', mode: 'lines', name: `z₀ = ${fmt(z, z < 0.01 ? 4 : 2)} m`, y: p.h.filter(h => h > z), x: p.h.filter(h => h > z).map(h => p.v_ref * profFactor(h, p.h_ref, z, kind)),
+      line: { color: cols[i], width: 2 }, hovertemplate: `%{y:.0f} m: <b>%{x:.2f}</b> m/s<extra>z₀ = ${z} m</extra>` }));
+    const L2 = baseLayout({ margin: { l: 64, r: 14, t: 34, b: 50 }, xaxis: { gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, rangemode: 'tozero', title: { text: 'Windgeschwindigkeit [m/s]', font: { color: C.ink2 } } } });
+    L2.yaxis.title.text = 'Höhe über Grund [m]'; L2.yaxis.range = [0, 250];
+    Plotly.react('chart-prof2', tr2, L2, CFG);
+  }
+  if (t === 'heat') {
+    const hm = res.heat, yr = hm.dates[0].slice(0, 4);
+    const L = baseLayout({ margin: { l: 56, r: 10, t: 14, b: 40 } });
+    L.xaxis = Object.assign(L.xaxis, { type: 'date', tickvals: MN.map((_, i) => `${yr}-${String(i + 1).padStart(2, '0')}-16`), ticktext: MN });
+    L.yaxis = Object.assign(L.yaxis, { title: { text: 'Stunde des Tages (Beginn des Intervalls, UTC)', font: { color: C.ink2 } }, dtick: 2, range: [-0.5, 23.5] });
+    Plotly.react('chart-heat', [{ type: 'heatmap', x: hm.dates, y: [...Array(24).keys()], z: hm.z, hoverongaps: false,
+      colorscale: [[0, '#f4f8fd'], [.12, '#cde2fb'], [.3, '#86b6ef'], [.5, '#3987e5'], [.7, '#1c5cab'], [1, '#0d366b']],
+      colorbar: { title: { text: 'kWh', side: 'top' }, thickness: 12, tickfont: { color: C.ink2 } },
+      hovertemplate: '%{x|%d.%m.}  %{y}:00 Uhr<br><b>%{z:,.0f}</b> kWh<extra></extra>' }], L, CFG);
+  }
+}
+function setHourRange(L) {
+  const start = $('#h-start').value; const span = Number($('#p-hour .chip.on')?.dataset.span ?? 7);
+  if (!start || !span) return;
+  const a = new Date(start + 'T00:00:00Z'), b = new Date(a.getTime() + span * 864e5);
+  const f = d => d.toISOString().slice(0, 16).replace('T', ' ');
+  L.xaxis3.range = [f(a), f(b)];
+}
+
+/* ---------------- Downloads ---------------- */
+function baseName() {
+  const k = res.kpi, src = $('#src').value === 'custom' ? `lat${num('lat').toFixed(2)}_lon${num('lon').toFixed(2)}` : $('#src').value;
+  return `windsim_${src}_${Math.round(k.p_nom_mw * 100) / 100}MW_${Math.round(k.hub)}m`;
+}
+function downloadCsv(kind) {
+  const names = { hourly: 'stundenwerte', daily: 'tageswerte', monthly: 'monatswerte' };
+  download(`${baseName()}_${names[kind]}.csv`, ['﻿', py.globals.get('get_csv')(kind)], 'text/csv;charset=utf-8');
+}
+function downloadKpi() {
+  const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const rows = [['Gruppe', 'Kennzahl', 'Wert', 'Einheit'], ...res.kpi_rows.map(r => [r[0], r[1].trim(), typeof r[2] === 'number' ? String(r[2]).replace('.', ',') : r[2], r[3]])];
+  download(`${baseName()}_jahreswerte.csv`, ['﻿', rows.map(r => r.map(q).join(';')).join('\n')], 'text/csv;charset=utf-8');
+}
+async function downloadXlsx() {
+  const b = $('#dl-xlsx'); const old = b.textContent; b.disabled = true; b.textContent = 'Erzeuge Excel-Datei …';
+  try {
+    if (!py.globals.get('_xlsx_ready')) { await py.runPythonAsync("import micropip\nawait micropip.install('openpyxl')\n_xlsx_ready = True"); }
+    const proxy = py.globals.get('get_xlsx')(); const bytes = proxy.toJs(); proxy.destroy();
+    download(`${baseName()}.xlsx`, [bytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  } catch (e) { fail(e); } finally { b.textContent = old; b.disabled = false; }
+}
+
+/* ---------------- Start ---------------- */
+async function initPython() {
+  setOverlay('Python-Laufzeit (Pyodide) wird geladen …', 10);
+  py = await loadPyodide();
+  setOverlay('numpy und pandas werden geladen …', 45);
+  await py.loadPackage(['numpy', 'pandas', 'micropip']);
+  setOverlay('Modell wird initialisiert …', 85);
+  py.runPython($('#wind-model').textContent);
+  return py;
+}
+async function init() {
+  const yr = $('#wx-year'); for (let y = new Date().getFullYear() - 1; y >= 2005; y--) yr.add(new Option(y, y)); yr.value = '2025';
+  $('#h-start').value = '2025-01-06';
+  try {
+    const [, [sites, anl]] = await Promise.all([initPython(), getData()]);
+    SITES = sites; ANL = anl;
+  } catch (e) {
+    $('#ov-err').textContent = 'Fehler beim Start: ' + e.message + ' – Liegt der Ordner „data“ neben der HTML-Datei? Sonst bitte wind_sim_standalone.html verwenden. (Python wird aus dem Internet geladen.)';
+    console.error(e); return;
+  }
+  const sel = $('#src'), groups = {};
+  SITES.forEach(s => { (groups[s.group] ||= []).push(s); });
+  Object.entries(groups).forEach(([g, list]) => { const og = document.createElement('optgroup'); og.label = g; list.forEach(s => og.appendChild(new Option(s.name, s.slug))); sel.appendChild(og); });
+  const og = document.createElement('optgroup'); og.label = 'Weitere Standorte (Online-Abruf)'; og.appendChild(new Option('Eigener Standort (ERA5 über Open-Meteo)…', 'custom')); sel.appendChild(og);
+  sel.value = 'Generisch';
+  ANL.forEach(a => $('#type').add(new Option(a.name, a.id))); $('#type').value = 'generisch';
+  TERRAINS.forEach(t => $('#terrain').add(new Option(`${fmt(t[0], t[0] < 0.01 ? 4 : 3)} m – ${t[1]}`, String(t[0])))); $('#terrain').add(new Option('Eigener Wert', 'custom'));
+  $('#terrain').value = '0.1';
+  applyType(); updateSketch();
+
+  // Ereignisse
+  $$('.inp').forEach(el => el.addEventListener('input', () => {
+    if (el.id === 'hub') $('#hub-r').value = el.value; if (el.id === 'z0') syncTerrain();
+    updateSketch(); scheduleRun(); }));
+  $('#hub-r').addEventListener('input', e => { $('#hub').value = e.target.value; updateSketch(); scheduleRun(); });
+  $('#terrain').addEventListener('change', e => { if (e.target.value !== 'custom') { $('#z0').value = e.target.value; scheduleRun(0); } });
+  $('#type').addEventListener('change', () => { applyType(); scheduleRun(0); });
+  $('#use100').addEventListener('change', () => { $('#href').disabled = $('#use100').checked; updateSketch(); scheduleRun(0); });
+  $$('input[name=prof]').forEach(r => r.addEventListener('change', () => scheduleRun(0)));
+  $('#src').addEventListener('change', loadSource);
+  $('#wx-fetch').onclick = fetchOpenMeteo; $('#geo-btn').onclick = geocode;
+  $('#geo-q').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); geocode(); } });
+  $$('#tabs .tab').forEach(b => b.onclick = () => { activeTab = b.dataset.tab; $$('#tabs .tab').forEach(x => x.setAttribute('aria-selected', x === b));
+    $$('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + activeTab)); renderTab(activeTab);
+    requestAnimationFrame(() => $$('#p-' + activeTab + ' .chart').forEach(c => { if (c.data) Plotly.Plots.resize(c); })); });
+  $('#month-metric').onchange = () => { dirty.add('month'); renderTab('month'); };
+  $('#day-metric').onchange = () => { dirty.add('day'); renderTab('day'); };
+  $$('[data-csv]').forEach(b => b.onclick = () => downloadCsv(b.dataset.csv));
+  $('#dl-kpi').onclick = downloadKpi; $('#dl-xlsx').onclick = downloadXlsx;
+  const applyHour = () => { if (!res) return; const L = { xaxis3: {} }; setHourRange(L);
+    Plotly.relayout('chart-hour', L.xaxis3.range ? { 'xaxis3.range': L.xaxis3.range } : { 'xaxis3.autorange': true }); };
+  $$('#p-hour .chip').forEach(c => c.onclick = () => { $$('#p-hour .chip').forEach(x => x.classList.toggle('on', x === c)); applyHour(); });
+  $('#h-start').addEventListener('change', applyHour);
+  window.addEventListener('resize', () => $$('.panel.on .chart').forEach(c => { if (c.data) Plotly.Plots.resize(c); }));
+
+  $('#overlay').style.display = 'none';
+  await loadSource();
+}
+init();
+</script>
+</body>
+</html>

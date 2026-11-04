@@ -1,3 +1,6 @@
-## [HP Keymark Plots](hpkeymark/plot.html)
+[PV.sim](pv.sim/pv.sim.html): PV-Ertragsberechner
 
-## [PV.sim](pv.sim/pvlib_simulator.html)
+[Wind.sim](wind.sim/wind.sim.html): Wind-Ertragsberechner
+
+[HP Keymark Plots](hpkeymark/plot.html)
+

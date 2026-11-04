@@ -1,14 +1,16 @@
-# PV-Ertragsprognose mit pvlib
+# pv.sim – Ertragssimulation von Photovoltaik-Systemen
 
 Eine einzelne HTML-Seite, die **pvlib direkt im Browser** (Pyodide/WebAssembly) ausführt – kein Server-Backend.
-Aus Standort, Anlagengröße, Neigung und Ausrichtung berechnet sie stündlich die Einstrahlung auf die Modulebene, die Zelltemperatur und den Ertrag und fasst die Ergebnisse zu Tages-, Monats- und Jahreswerten zusammen. Vorlage ist der Excel-Rechner (`excel_tool/`).
+Aus Standort, Anlagengröße, Neigung und Ausrichtung berechnet sie stündlich die Einstrahlung auf die Modulebene, die Zelltemperatur und den Ertrag und fasst die Ergebnisse zu Tages-, Monats- und Jahreswerten zusammen. Vorlage ist der Excel-Tool (`excel_tool/`).
 
-**Credits:** Prof. Dr. Manuel Lämmle auf Vorlage des Excel-Rechners von Prof. Dr. Henrik te Heesen, Umwelt-Campus Birkenfeld, Institut für Betriebs- und Technologiemanagement (IBT). Erstellt für das Modul „Erneuerbare Energie“ im Studiengang Sustainable Business Development.
+**Credits:** pv.sim: Prof. Dr. Manuel Lämmle, Hochschule Offenburg. Erstellt für das Modul „Erneuerbare Energie“ im Studiengang Sustainable Business Development.
+
+**Vorlage (Excel-Tool):** Borger, Jonas; Hermesdorf, Felix; Trester, Samuel; te Heesen, Henrik (2026). Photovoltaik-Ertragssimulation (Version vom 4. August 2026) [Computerprogramm]. Hochschule Trier. Verfügbar unter: [umwelt-campus.de/energietools](https://umwelt-campus.de/energietools) (Zugriff am: 4. November 2026).
 
 ```
-pvlib_simulator/
-├── pvlib_simulator.html             # Oberfläche + eingebettetes Python-Modell; lädt data/*.js bei Bedarf
-├── pvlib_simulator_standalone.html  # dieselbe Seite mit eingebetteten Wetterdaten (eine einzelne Datei, ~1,8 MB)
+pv.sim/
+├── pv.sim.html             # Oberfläche + eingebettetes Python-Modell; lädt data/*.js bei Bedarf
+├── pv.sim_standalone.html  # dieselbe Seite mit eingebetteten Wetterdaten (eine einzelne Datei, ~1,8 MB)
 ├── data/
 │   ├── standorte.js / .json    # Name, Koordinaten, Höhe, Datei, UTC-Offset je Standort
 │   ├── <Standort>.js           # Wetterdaten als Script (wird per <script>-Tag geladen, geht auch bei file://)
@@ -22,26 +24,26 @@ Die theoretischen Grundlagen (Strahlung, Sonnenstand, Transposition, Zelltempera
 
 ## Öffnen
 
-* **Einfach per Doppelklick:** `pvlib_simulator.html` (Ordner `data/` muss daneben liegen) oder `pvlib_simulator_standalone.html` (eine Datei, auch für Vorschau-Fenster ohne Basis-URL oder zum Verschicken). Die Wetterdaten werden per `<script>`-Tag geladen, es ist kein Webserver nötig.
+* **Einfach per Doppelklick:** `pv.sim.html` (Ordner `data/` muss daneben liegen) oder `pv.sim_standalone.html` (eine Datei, auch für Vorschau-Fenster ohne Basis-URL oder zum Verschicken). Die Wetterdaten werden per `<script>`-Tag geladen, es ist kein Webserver nötig.
 * **Internet:** Pyodide, numpy/pandas/scipy und pvlib werden beim Start vom CDN geladen (ca. 20–30 s beim ersten Mal, danach im Browser-Cache). Ohne Internet startet die Seite nicht; Open-Meteo-Abruf braucht ebenfalls Internet.
 
 Alternativ mit lokalem Server:
 
 ```bash
-cd pvlib_simulator
+cd pv.sim
 python3 -m http.server 8000
-# dann http://localhost:8000/pvlib_simulator.html öffnen
+# dann http://localhost:8000/pv.sim.html öffnen
 ```
 
 ## GitHub Pages
 
-Den Ordner `pvlib_simulator/` ins Repository legen und Pages aktivieren. Es ist nichts zu bauen.
+Den Ordner `pv.sim/` ins Repository legen und Pages aktivieren. Es ist nichts zu bauen.
 `data/*.js` müssen mit ausgeliefert werden (ca. 1,7 MB gesamt, es wird nur der gewählte Standort geladen).
 
 ## Neue TRY-Standorte hinzufügen
 
 1. `TRY_<Name>.xlsx` nach `excel_tool/` legen, Name und Koordinaten in `STANDORTE` in `convert_try_to_csv.py` ergänzen.
-2. `python3 pvlib_simulator/convert_try_to_csv.py` ausführen (benötigt `openpyxl`); erzeugt CSV, JSON und JS.
+2. `python3 pv.sim/convert_try_to_csv.py` ausführen (benötigt `openpyxl`); erzeugt CSV, JSON und JS. Dateinamen werden dabei auf ASCII umgestellt (ä→ae, ö→oe, ü→ue), z. B. `Muenchen.js`.
 3. Die Standalone-Variante enthält die Daten eingebettet und muss danach neu gebaut werden.
 
 Hinweis: Basel und Lörrach liegen im selben DWD-Gitterfeld und haben deshalb identische Wetterdaten.
