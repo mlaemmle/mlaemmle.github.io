@@ -41,5 +41,3 @@
 - Diplom-Studiengang mit Vertiefungsrichtung Energie- und Umwelttechnik
 - Diplomarbeit: Assessment of the global potential for CO2 mitigation of carbon capture and storage (CCS) until 2050 am Fraunhofer ISI
 - Hauptfächer: Energietechnik, Thermische Turbomaschinen, Strömungsmaschinen und Windenergie
-
-
