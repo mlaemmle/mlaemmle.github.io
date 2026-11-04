@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PV-Ertragsprognose (pvlib)</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f5f4;
+    --surface: #ffffff;
+    --ink: #1a1a1a;
+    --ink-2: #52514e;
+    --ink-3: #898781;
+    --line: #e1e0d9;
+    --line-2: #c3c2b7;
+    --accent: #1a1a1a;
+    --blue: #2a78d6;
+    --blue-dark: #1c5cab;
+    --blue-soft: #e8f1fc;
+    --orange: #eb6834;
+    --aqua: #1baf7a;
+    --yellow: #eda100;
+    --danger: #d03b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.45;
+  }
+  header.top {
+    max-width: 1680px; margin: 0 auto; padding: 22px 24px 8px;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; justify-content: space-between;
+  }
+  header.top h1 { font-size: 20px; font-weight: 600; }
+  header.top p { font-size: 13px; color: var(--ink-3); }
+  .layout {
+    max-width: 1680px; margin: 0 auto; padding: 12px 24px 40px;
+    display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 18px; align-items: start;
+  }
+  @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; padding: 12px 16px 32px; } header.top { padding: 18px 16px 4px; } }
+  aside { display: flex; flex-direction: column; gap: 14px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px;
+  }
+  .card h2 { font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label, .lbl { font-size: 12px; color: var(--ink-2); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  input[type=number], input[type=text], select {
+    width: 100%; font: inherit; color: var(--ink); background: #fafafa; border: 1px solid #d6d5cd;
+    border-radius: 8px; padding: 7px 9px; min-height: 34px;
+  }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+  input.bad { border-color: var(--danger); background: #fdf1f1; }
+  .unit-wrap { position: relative; }
+  .unit-wrap input { padding-right: 46px; }
+  .unit-wrap.s input { padding-right: 26px; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+  .unit-wrap span { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--ink-3); pointer-events: none; }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: #efeeea; border-radius: 9px; padding: 3px; gap: 3px; margin-bottom: 12px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { text-align: center; font-size: 12.5px; padding: 6px 8px; border-radius: 7px; cursor: pointer; color: var(--ink-2); }
+  .seg input:checked + label { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); font-weight: 600; }
+  .seg input:focus-visible + label { outline: 2px solid var(--blue); }
+  .hint { font-size: 12px; color: var(--ink-3); }
+  .hint.warn { color: #b3541f; }
+  .hint.err { color: var(--danger); }
+  .calc { font-size: 12.5px; color: var(--ink-2); background: var(--blue-soft); border-radius: 8px; padding: 6px 10px; margin-top: 2px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip, .btn {
+    font: inherit; font-size: 12px; padding: 4px 11px; border-radius: 999px; border: 1px solid #d6d5cd;
+    background: #fafafa; color: #333; cursor: pointer;
+  }
+  .chip:hover, .btn:hover { background: #f0efec; }
+  .chip.on, .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn { font-size: 13px; padding: 7px 14px; border-radius: 9px; }
+  .btn.primary:hover { background: #333; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  input[type=range] { width: 100%; accent-color: var(--blue); }
+  details.card summary { cursor: pointer; font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-2); list-style: none; display: flex; justify-content: space-between; }
+  details.card summary::after { content: "▾"; color: var(--ink-3); }
+  details.card[open] summary::after { content: "▴"; }
+  details.card[open] summary { margin-bottom: 12px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+  .check input { margin-top: 3px; accent-color: var(--blue); }
+  .geo-res { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .geo-res button { text-align: left; font: inherit; font-size: 12.5px; padding: 6px 9px; border: 1px solid var(--line); background: #fafafa; border-radius: 8px; cursor: pointer; }
+  .geo-res button:hover { background: var(--blue-soft); }
+
+  /* Modul-Skizze */
+  .sketch { display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; align-items: end; margin-bottom: 8px; }
+  .sketch figure { background: #fafaf8; border: 1px solid var(--line); border-radius: 10px; padding: 6px 4px 4px; }
+  .sketch figcaption { font-size: 12px; color: var(--ink-2); text-align: center; padding: 2px 0 4px; }
+  .sketch figcaption b { color: var(--ink); font-weight: 600; }
+  .sketch svg { width: 100%; height: auto; display: block; }
+
+  /* Ergebnisse */
+  main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .status { font-size: 12.5px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; min-height: 20px; }
+  .status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--aqua); flex: none; }
+  .status.busy .dot { background: var(--yellow); animation: pulse 1s infinite; }
+  .status.err .dot { background: var(--danger); }
+  @keyframes pulse { 50% { opacity: .3; } }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 760px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .tile .k { font-size: 12px; color: var(--ink-2); }
+  .tile .v { font-size: 26px; font-weight: 600; margin-top: 2px; letter-spacing: -.01em; }
+  .tile .v small { font-size: 13px; font-weight: 400; color: var(--ink-3); margin-left: 4px; letter-spacing: 0; }
+  .tile .s { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab { font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 999px; border: 1px solid #d6d5cd; background: #fafafa; color: #333; cursor: pointer; }
+  .tab[aria-selected=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .panel { display: none; }
+  .panel.on { display: block; }
+  .panel-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .toolbar .grp { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .toolbar select, .toolbar input[type=date] { width: auto; min-width: 0; max-width: 100%; }
+  .toolbar .grp { min-width: 0; max-width: 100%; }
+  @media (max-width: 600px) { .toolbar .grp:first-child { flex: 1 1 100%; } .toolbar select { flex: 1; } .panel-card { padding: 14px 12px; } }
+  .chart { width: 100%; height: 440px; }
+  .chart.tall { height: 640px; }
+  .tablewrap { max-height: 340px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; margin-top: 12px; }
+  table.data { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  table.data th { position: sticky; top: 0; background: #f3f2ee; text-align: right; padding: 7px 10px; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+  table.data th:first-child, table.data td:first-child { text-align: left; position: sticky; left: 0; background: inherit; }
+  table.data th:first-child { background: #f3f2ee; z-index: 1; }
+  table.data td { text-align: right; padding: 5px 10px; border-bottom: 1px solid #efeee9; white-space: nowrap; background: #fff; }
+  table.data tr:hover td { background: var(--blue-soft); }
+  .kpi-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .kpi-group h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-2); margin-bottom: 6px; }
+  .kpi-group table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .kpi-group td { padding: 5px 0; border-bottom: 1px solid #efeee9; }
+  .kpi-group td.n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .kpi-group td.u { color: var(--ink-3); width: 62px; padding-left: 6px; }
+  .note { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+  .legend-note { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color: var(--ink-2); margin: 4px 0 0; }
+
+  #overlay { position: fixed; inset: 0; background: rgba(245,245,244,.92); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  #overlay .box { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 30px; width: min(420px, 90vw); }
+  #overlay h2 { font-size: 16px; margin-bottom: 4px; }
+  #overlay p { font-size: 13px; color: var(--ink-2); margin-bottom: 14px; }
+  .bar { height: 6px; background: #efeee9; border-radius: 99px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 5%; background: var(--blue); transition: width .4s; }
+  .methods li { margin: 3px 0 3px 18px; }
+  .theory { max-width: 860px; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  .theory h2 { font-size: 18px; margin-bottom: 8px; }
+  .theory h3 { font-size: 15px; margin: 24px 0 6px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .theory p { margin: 6px 0; color: var(--ink-2); }
+  .theory ul { margin: 6px 0 6px 20px; color: var(--ink-2); }
+  .theory li { margin: 5px 0; }
+  .theory table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+  .theory th, .theory td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid #efeee9; }
+  .theory th { font-weight: 600; background: #fafaf8; }
+  .theory td:first-child { font-weight: 600; white-space: nowrap; }
+  .theory .formula { margin: 8px 0; padding: 6px 12px; background: #fafaf8; border-radius: 8px; overflow-x: auto; color: var(--ink); }
+  .theory .chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; margin: 10px 0 4px; }
+  .theory .chain span { display: flex; flex-direction: column; padding: 7px 11px; border: 1px solid #d6d5cd; border-radius: 10px; background: #fafaf8; font-weight: 600; font-size: 13px; }
+  .theory .chain small { font-weight: 400; font-size: 11px; color: var(--ink-3); }
+  .theory .chain i { align-self: center; font-style: normal; color: var(--ink-3); }
+  @media (max-width: 700px) { .theory td:first-child { white-space: normal; } }
+  footer { max-width: 1680px; margin: 0 auto; padding: 0 24px 28px; font-size: 12px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+
+<div id="overlay"><div class="box">
+  <h2>PV-Ertragsprognose wird vorbereitet …</h2>
+  <p id="ov-msg">Python-Laufzeit (Pyodide) wird geladen</p>
+  <div class="bar"><i id="ov-bar"></i></div>
+  <p class="hint" style="margin-top:12px;margin-bottom:0" id="ov-err"></p>
+</div></div>
+
+<header class="top">
+  <h1>PV-Ertragsprognose</h1>
+</header>
+
+<div class="layout">
+<aside>
+  <!-- STANDORT -->
+  <section class="card">
+    <h2>Standort &amp; Wetterdaten</h2>
+    <div class="field">
+      <label for="src">Wetterdaten</label>
+      <select id="src"></select>
+    </div>
+    <div id="custom-box" hidden>
+      <div class="field">
+        <label for="geo-q">Ort suchen (optional)</label>
+        <div style="display:flex;gap:6px"><input type="text" id="geo-q" placeholder="z. B. Kassel" autocomplete="off"><button class="btn" id="geo-btn" type="button">Suchen</button></div>
+        <div class="geo-res" id="geo-res"></div>
+      </div>
+      <div class="field">
+        <label for="wx-year">Wetterjahr (ERA5-Reanalyse, Open-Meteo)</label>
+        <select id="wx-year"></select>
+      </div>
+      <div class="field"><button class="btn primary" id="wx-fetch" type="button">Wetterdaten abrufen</button>
+        <span class="hint" id="wx-hint">Koordinaten eingeben bzw. Ort suchen, dann Daten abrufen.</span></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label for="lat">Breite</label><div class="unit-wrap s"><input type="number" id="lat" class="inp" step="0.0001" min="-90" max="90"><span>° N</span></div></div>
+      <div class="field"><label for="lon">Länge</label><div class="unit-wrap s"><input type="number" id="lon" class="inp" step="0.0001" min="-180" max="180"><span>° O</span></div></div>
+      <div class="field"><label for="alt">Höhe</label><div class="unit-wrap s"><input type="number" id="alt" class="inp" step="1"><span>m</span></div></div>
+    </div>
+    <p class="hint" id="src-hint"></p>
+  </section>
+
+  <!-- ANLAGE -->
+  <section class="card">
+    <h2>PV-Anlage</h2>
+    <div class="seg" role="radiogroup" aria-label="Eingabeart">
+      <input type="radio" name="pm" id="pm-kwp" value="kwp" checked><label for="pm-kwp">Leistung (kWp)</label>
+      <input type="radio" name="pm" id="pm-area" value="area"><label for="pm-area">Fläche × Wirkungsgrad</label>
+    </div>
+    <div id="box-kwp" class="field"><label for="kwp">Nennleistung</label><div class="unit-wrap"><input type="number" id="kwp" class="inp" value="10" min="0.01" step="0.1"><span>kWp</span></div></div>
+    <div id="box-area" hidden>
+      <div class="row">
+        <div class="field"><label for="area">Modulfläche</label><div class="unit-wrap"><input type="number" id="area" class="inp" value="50" min="0.1" step="0.5"><span>m²</span></div></div>
+        <div class="field"><label for="eta">Wirkungsgrad</label><div class="unit-wrap"><input type="number" id="eta" class="inp" value="20" min="1" max="100" step="0.1"><span>%</span></div></div>
+      </div>
+      <div class="calc" id="kwp-calc"></div>
+    </div>
+  </section>
+
+  <!-- AUSRICHTUNG -->
+  <section class="card">
+    <h2>Ausrichtung</h2>
+    <div class="sketch">
+      <figure><div id="svg-side"></div><figcaption id="cap-side"></figcaption></figure>
+      <figure><div id="svg-top"></div><figcaption id="cap-top"></figcaption></figure>
+    </div>
+    <div class="field">
+      <label for="tilt">Neigung β (0° = flach, 90° = senkrecht)</label>
+      <div style="display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:center">
+        <input type="range" id="tilt-r" min="0" max="90" step="1" value="30" aria-label="Neigung Regler">
+        <div class="unit-wrap s"><input type="number" id="tilt" class="inp" min="0" max="90" step="1" value="30"><span>°</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="az">Azimut α (0° = Nord, 90° = Ost, 180° = Süd, 270° = West)</label>
+      <div style="display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:center">
+        <input type="range" id="az-r" min="0" max="360" step="1" value="180" aria-label="Azimut Regler">
+        <div class="unit-wrap s"><input type="number" id="az" class="inp" min="0" max="360" step="1" value="180"><span>°</span></div>
+      </div>
+      <div class="chips" id="az-chips">
+        <button type="button" class="chip" data-az="0">Nord</button>
+        <button type="button" class="chip" data-az="90">Ost</button>
+        <button type="button" class="chip" data-az="135">Südost</button>
+        <button type="button" class="chip" data-az="180">Süd</button>
+        <button type="button" class="chip" data-az="225">Südwest</button>
+        <button type="button" class="chip" data-az="270">West</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ERWEITERT -->
+  <details class="card">
+    <summary>Erweiterte Einstellungen</summary>
+    <div class="field">
+      <span class="lbl">Modellvariante</span>
+      <div class="seg" style="margin-bottom:0" role="radiogroup" aria-label="Modellvariante">
+        <input type="radio" name="model" id="m-pvlib" value="pvlib" checked><label for="m-pvlib">pvlib-Standard</label>
+        <input type="radio" name="model" id="m-excel" value="excel"><label for="m-excel">Excel-kompatibel</label>
+      </div>
+      <span class="hint" id="model-hint">Perez-Transposition, SAPM-Zelltemperatur mit Wind, Reflexionsverluste (IAM), PVWatts.</span>
+    </div>
+    <div class="field"><label for="mount">Montageart (bestimmt die Modultemperatur)</label><select id="mount" class="inp"></select></div>
+    <div class="row">
+      <div class="field"><label for="gamma">Temperaturkoeffizient</label><div class="unit-wrap"><input type="number" id="gamma" class="inp" value="-0.35" min="-1.5" max="0" step="0.01"><span>%/K</span></div></div>
+      <div class="field"><label for="derating">Derating-Faktor</label><div class="unit-wrap s"><input type="number" id="derating" class="inp" value="0.85" min="0.5" max="1" step="0.01"><span>–</span></div></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="albedo">Albedo (Bodenreflexion)</label><div class="unit-wrap s"><input type="number" id="albedo" class="inp" value="0.20" min="0" max="1" step="0.01"><span>–</span></div></div>
+      <div class="field" style="justify-content:flex-end"><label class="check"><input type="checkbox" id="iam" class="inp" checked><span>Reflexionsverluste (IAM)</span></label></div>
+    </div>
+    <p class="hint">Derating = Systemverluste (Wechselrichter, Kabel, Verschmutzung, Mismatch). Excel-Vorgabe: 0,85.</p>
+  </details>
+</aside>
+
+<main>
+  <div class="status busy" id="status"><span class="dot"></span><span id="status-txt">Lade …</span></div>
+  <div class="tiles" id="tiles"></div>
+
+  <div class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-tab="year" aria-selected="true">Jahreswerte</button>
+    <button class="tab" role="tab" data-tab="month" aria-selected="false">Monatswerte</button>
+    <button class="tab" role="tab" data-tab="day" aria-selected="false">Tageswerte</button>
+    <button class="tab" role="tab" data-tab="hour" aria-selected="false">Stundenwerte</button>
+    <button class="tab" role="tab" data-tab="heat" aria-selected="false">Heatmap</button>
+    <button class="tab" role="tab" data-tab="theory" aria-selected="false">Grundlagen</button>
+    <span style="flex:1"></span>
+    <button class="btn" id="dl-xlsx" type="button" disabled>⬇ Alles als Excel (.xlsx)</button>
+  </div>
+
+  <!-- Jahreswerte -->
+  <section class="panel on panel-card" id="p-year">
+    <div class="toolbar"><div class="grp"><b>Jahreskennzahlen</b><span class="hint" id="year-sub"></span></div>
+      <div class="grp"><button class="btn" id="dl-kpi" type="button" disabled>⬇ CSV</button></div></div>
+    <div class="kpi-groups" id="kpi-groups"></div>
+    <p class="note">Performance Ratio = spezifischer Ertrag / Einstrahlung in Modulebene. Kapazitätsfaktor = Jahresertrag / (Nennleistung × 8760 h) (im Excel „Annual efficiency“).</p>
+    <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--ink-2)">Methodik &amp; Annahmen</summary>
+      <ul class="methods" id="methods" style="margin-top:6px;font-size:13px;color:var(--ink-2)"></ul>
+    </details>
+  </section>
+
+  <!-- Grundlagen -->
+  <section class="panel panel-card" id="p-theory">
+    <div class="theory">
+      <h2>Theoretische Grundlagen der Ertragsberechnung</h2>
+      <p>Die Rechenkette ist für jede Stunde des Jahres dieselbe:</p>
+      <div class="chain">
+        <span>Wetterdaten<small>BHI, DHI, Temperatur, Wind</small></span><i>→</i>
+        <span>Sonnenstand<small>Zenit θ<sub>z</sub>, Azimut γ<sub>s</sub></small></span><i>→</i>
+        <span>Einfallswinkel<small>θ auf das Modul</small></span><i>→</i>
+        <span>Einstrahlung<small>direkt + diffus + Boden</small></span><i>→</i>
+        <span>Reflexion (IAM)<small>effektive Einstrahlung</small></span><i>→</i>
+        <span>Zelltemperatur<small>T<sub>c</sub></small></span><i>→</i>
+        <span>Leistung<small>P, Energie E = P · 1 h</small></span>
+      </div>
+
+      <h3>1 · Strahlungsgrößen</h3>
+      <table>
+        <tr><th>Symbol</th><th>Größe</th><th>Bedeutung</th></tr>
+        <tr><td>BHI</td><td>Direkte Strahlung auf die Horizontale</td><td>ungestreuter Anteil der Sonnenstrahlung, gemessen auf einer waagerechten Fläche</td></tr>
+        <tr><td>DHI</td><td>Diffuse Strahlung auf die Horizontale</td><td>an Wolken und Luft gestreute Strahlung aus dem ganzen Himmel</td></tr>
+        <tr><td>GHI</td><td>Globalstrahlung (horizontal)</td><td>GHI = BHI + DHI</td></tr>
+        <tr><td>DNI</td><td>Direktnormalstrahlung</td><td>direkte Strahlung auf eine zur Sonne gerichtete Fläche</td></tr>
+      </table>
+      <p>Die TRY-Daten liefern BHI und DHI. Daraus folgt die Direktnormalstrahlung über den Sonnenzenitwinkel θ<sub>z</sub>:</p>
+      <div class="formula">\[ \mathrm{DNI}=\frac{\mathrm{BHI}}{\cos\theta_z} \]</div>
+      <p>Bei sehr flacher Sonne (cos θ<sub>z</sub> &lt; 0,05, Sonnenhöhe unter ca. 3°) ist diese Division numerisch instabil. Dann wird die gesamte Strahlung als diffus behandelt (die Energie bleibt erhalten); außerdem wird DNI auf die extraterrestrische Strahlung begrenzt.</p>
+
+      <h3>2 · Sonnenstand</h3>
+      <p>Der Sonnenstand folgt aus Breite, Länge, Höhe und Zeitpunkt. pvlib nutzt den <b>NREL-SPA-Algorithmus</b> (Genauigkeit besser als 0,01°). Er liefert den Zenitwinkel θ<sub>z</sub> (= 90° − Sonnenhöhe) und den Sonnenazimut γ<sub>s</sub>. Berechnet wird er für die <b>Mitte der Stunde</b>, weil die Strahlungswerte Stundenmittel sind.</p>
+      <p>Azimute gelten als <b>0° = Nord, 90° = Ost, 180° = Süd, 270° = West</b>. Die Neigung β ist der Winkel des Moduls zur Horizontalen (0° = liegend, 90° = senkrecht).</p>
+
+      <h3>3 · Einfallswinkel auf das Modul</h3>
+      <p>Der Winkel θ zwischen Sonnenstrahl und Modulnormale bestimmt, wie viel direkte Strahlung auf die geneigte Fläche trifft:</p>
+      <div class="formula">\[ \cos\theta=\cos\beta\,\cos\theta_z+\sin\beta\,\sin\theta_z\,\cos(\gamma_s-\gamma_M) \]</div>
+      <p>mit Modulneigung β und Modulazimut γ<sub>M</sub>. Die direkte Strahlung auf der Modulebene ist</p>
+      <div class="formula">\[ G_\mathrm{dir}=\mathrm{DNI}\cdot\max(\cos\theta,\,0) \]</div>
+      <p>Das erklärt die typischen Optima: Eine Südausrichtung mit 30–40° Neigung maximiert den Jahresertrag in Mitteleuropa; Ost-West-Anlagen liefern weniger Jahresertrag, dafür gleichmäßiger über den Tag.</p>
+
+      <h3>4 · Einstrahlung auf der Modulebene (Transposition)</h3>
+      <p>Die Gesamteinstrahlung auf der geneigten Fläche (<i>plane of array</i>, POA) setzt sich aus drei Anteilen zusammen:</p>
+      <div class="formula">\[ G_\mathrm{POA}=G_\mathrm{dir}+G_\mathrm{dif}+G_\mathrm{refl} \]</div>
+      <ul>
+        <li><b>Direkt</b> G<sub>dir</sub>: siehe oben.</li>
+        <li><b>Bodenreflexion</b> mit der Albedo ρ (Standard 0,2 für Gras/Boden; Schnee etwa 0,6–0,8):
+          <div class="formula">\[ G_\mathrm{refl}=\rho\cdot\mathrm{GHI}\cdot\frac{1-\cos\beta}{2} \]</div></li>
+        <li><b>Diffus</b> G<sub>dif</sub> – hier unterscheiden sich die Modelle:
+          <ul>
+            <li><i>Isotropes Modell</i> (Excel-kompatibler Modus): Der Himmel strahlt gleichmäßig,
+              <div class="formula">\[ G_\mathrm{dif}=\mathrm{DHI}\cdot\frac{1+\cos\beta}{2} \]</div>
+              Das ist einfach, unterschätzt aber die Aufhellung um die Sonne (zirkumsolar) und am Horizont.</li>
+            <li><i>Perez-Modell</i> (pvlib-Standard): anisotrop; trennt isotrope, zirkumsolare und Horizontaufhellungs-Anteile je nach Himmelsklarheit und Luftmasse. Es gilt als eines der genauesten Transpositionsmodelle und liefert für geneigte Südflächen meist etwas mehr diffuse Einstrahlung als das isotrope Modell.</li>
+          </ul></li>
+      </ul>
+
+      <h3>5 · Reflexionsverluste (IAM)</h3>
+      <p>Bei flachem Einfall wird ein Teil der Strahlung an der Glasoberfläche reflektiert. Der <i>Incidence Angle Modifier</i> (IAM) beschreibt den durchgelassenen Anteil in Abhängigkeit vom Einfallswinkel (Fresnel-Reflexion mit Brechungsindex n = 1,526 und Absorption im Glas, K = 4 m<sup>−1</sup>, L = 2 mm). Für diffuse und bodenreflektierte Strahlung gilt ein über alle Einfallswinkel gemittelter IAM (Marion-Verfahren). Die effektive Einstrahlung ist</p>
+      <div class="formula">\[ G_\mathrm{eff}=G_\mathrm{dir}\cdot\mathrm{IAM}(\theta)+G_\mathrm{dif}\cdot\mathrm{IAM}_\mathrm{dif}+G_\mathrm{refl}\cdot\mathrm{IAM}_\mathrm{refl} \]</div>
+      <p>Typisch ergeben sich Jahresverluste von wenigen Prozent. Der Excel-Rechner berücksichtigt sie nicht; in dieser Seite lassen sie sich unter „Erweiterte Einstellungen“ abschalten.</p>
+
+      <h3>6 · Zelltemperatur</h3>
+      <p>Der Wirkungsgrad kristalliner Module sinkt mit steigender Zelltemperatur. Die Zelle ist im Betrieb deutlich wärmer als die Luft; wie viel wärmer, hängt von Einstrahlung, Wind und Montageart (Hinterlüftung) ab.</p>
+      <ul>
+        <li><b>Einfaches Modell</b> (Excel): Die Zelltemperatur steigt linear mit der Einstrahlung.
+          <div class="formula">\[ T_c=T_\mathrm{Luft}+\Delta T\cdot\frac{G_\mathrm{POA}}{1000\ \mathrm{W/m^2}} \]</div>
+          mit ΔT = 29 K (Aufdach, hinterlüftet), 32 K (Indach, hinterlüftet), 43 K (Indach, nicht hinterlüftet), 28 K (Flachdach, aufgeständert), 22 K (Freifläche).</li>
+        <li><b>SAPM-Modell</b> (pvlib-Standard, Sandia): berücksichtigt zusätzlich die Windgeschwindigkeit v in 10 m Höhe.
+          <div class="formula">\[ T_\mathrm{Modul}=G_\mathrm{POA}\cdot e^{a+b\,v}+T_\mathrm{Luft},\qquad T_c=T_\mathrm{Modul}+\frac{G_\mathrm{POA}}{1000}\,\Delta T_\mathrm{SAPM} \]</div>
+          Die Parameter a, b und ΔT hängen von der Montageart ab: <i>open rack</i> (frei aufgeständert), <i>close mount</i> (Aufdach), <i>insulated back</i> (Indach, gedämmt).</li>
+      </ul>
+
+      <h3>7 · Leistung und Energie</h3>
+      <p>Die Gleichstromleistung folgt dem <b>PVWatts-Modell</b>:</p>
+      <div class="formula">\[ P=P_\mathrm{nom}\cdot\frac{G_\mathrm{eff}}{1000\ \mathrm{W/m^2}}\cdot\bigl[1+\gamma\,(T_c-25^{\circ}\mathrm{C})\bigr]\cdot f_\mathrm{Derating} \]</div>
+      <ul>
+        <li><b>P<sub>nom</sub></b>: Nennleistung unter Standardtestbedingungen (STC: 1000 W/m², 25 °C Zelltemperatur). Alternativ aus Modulfläche A und Wirkungsgrad η:
+          <div class="formula">\[ P_\mathrm{nom}=A\cdot\eta\cdot 1\ \mathrm{kW/m^2} \]</div></li>
+        <li><b>γ</b>: Temperaturkoeffizient der Leistung (kristallines Silizium typisch −0,3 bis −0,5 %/K; Standard hier −0,35 %/K, im Excel −0,48 %/K). Bei 50 °C Zelltemperatur sinkt die Leistung damit um etwa 9 %.</li>
+        <li><b>f<sub>Derating</sub></b>: Sammelfaktor für alle übrigen Verluste: Wechselrichter, Kabel, Verschmutzung, Mismatch, Degradation (Standard 0,85).</li>
+      </ul>
+      <p>Die Wetterdaten sind Stundenmittelwerte; die mittlere Leistung in Watt entspricht über eine Stunde also der Energie in Wh. Die Jahresenergie ist die Summe über alle 8760 Stunden.</p>
+
+      <h3>8 · Kennzahlen</h3>
+      <table>
+        <tr><th>Kennzahl</th><th>Definition</th><th>Aussage</th></tr>
+        <tr><td>Jahresertrag E</td><td>\( \sum P\cdot 1\,\mathrm{h} \) [kWh]</td><td>erzeugte Energie</td></tr>
+        <tr><td>Spezifischer Ertrag</td><td>\( E/P_\mathrm{nom} \) [kWh/kWp]</td><td>Vergleich von Anlagen unterschiedlicher Größe; für Deutschland typisch ca. 900–1100 kWh/kWp</td></tr>
+        <tr><td>Volllaststunden</td><td>= spezifischer Ertrag [h]</td><td>Zeit, die die Anlage mit Nennleistung laufen müsste, um den Ertrag zu erzielen</td></tr>
+        <tr><td>Performance Ratio PR</td><td>\( \dfrac{E/P_\mathrm{nom}}{H_\mathrm{POA}/1\,\mathrm{kW/m^2}} \)</td><td>Qualität der Anlage unabhängig vom Strahlungsangebot (typisch 75–85 %); fasst Temperatur-, Reflexions- und Systemverluste zusammen</td></tr>
+        <tr><td>Kapazitätsfaktor</td><td>\( \dfrac{E}{P_\mathrm{nom}\cdot 8760\,\mathrm{h}} \)</td><td>mittlere Auslastung über das ganze Jahr (typisch 10–12 %)</td></tr>
+        <tr><td>Transpositionsgewinn</td><td>\( H_\mathrm{POA}/H_\mathrm{GHI}-1 \)</td><td>Mehr- bzw. Mindereinstrahlung durch Neigung und Ausrichtung gegenüber der Horizontalen</td></tr>
+      </table>
+
+      <h3>9 · Wetterdaten und Zeitbezug</h3>
+      <ul>
+        <li><b>DWD-Testreferenzjahre (TRY)</b> sind aus Messjahren zusammengesetzte „typische“ Jahre (8760 Stunden). Sie bilden einen mittleren Jahresverlauf ab, aber kein einzelnes reales Jahr. Zeit: MEZ (UTC+1, ohne Sommerzeit); der Wert der Stunde HH ist der Mittelwert der vorangegangenen Stunde.</li>
+        <li><b>Open-Meteo/ERA5</b> liefert für beliebige Orte Daten eines wählbaren Kalenderjahres (Reanalyse mit grobem Raster von einigen 10 km, Zeitstempel in UTC).</li>
+        <li>Intern rechnet das Modell in UTC mit dem Stundenbeginn als Zeitstempel; Tages- und Monatswerte werden in der Standardzeit des Standorts aggregiert.</li>
+      </ul>
+
+      <h3>10 · Grenzen des Modells</h3>
+      <ul>
+        <li>Keine Verschattung (Horizont, Nachbargebäude, Gauben) und keine Schneebedeckung.</li>
+        <li>Keine Wechselrichter-Kennlinie; Wechselrichter, Kabel und Verschmutzung stecken im Derating-Faktor.</li>
+        <li>Keine Modulalterung (Degradation) über die Lebensdauer.</li>
+        <li>Ein Wetterjahr ist nicht das Wetter des nächsten Jahres: Der Jahresertrag schwankt real um etwa ±5–10 %. Die Ergebnisse sind Prognosen, keine Garantie.</li>
+      </ul>
+
+      <h3>Unterschiede zum Excel-Rechner</h3>
+      <p>Mit identischen Eingaben (Excel-Wetterdaten, Modus „Excel-kompatibel“) zeigt sich:</p>
+      <ul>
+        <li>Sonnenhöhe und Einfallswinkelformel stimmen überein (Abweichung der Sonnenhöhe &lt; 0,5°).</li>
+        <li>Das Excel bestimmt den <b>Sonnenazimut</b> über die Stunde der wahren Ortszeit (≤ 12). In der Stunde um den Sonnenhöchststand liegt die Sonne dadurch auf der falschen Seite des Meridians (bis ca. 58° Fehler, etwa 7 % der Tagesstunden).</li>
+        <li>Die <b>reflektierte Strahlung</b> wird im Excel mit DNI + DHI statt mit der Globalstrahlung auf die Horizontale (BHI + DHI) berechnet und ist dadurch etwa 40 % zu hoch.</li>
+      </ul>
+      <p>Im Testfall (49,6° N / 7,16° O, 45°, Ost) liegt das pvlib-Ergebnis im Excel-kompatiblen Modus deshalb ca. 4 % unter dem Excel-Wert.</p>
+    </div>
+  </section>
+
+  <!-- Monatswerte -->
+  <section class="panel panel-card" id="p-month">
+    <div class="toolbar">
+      <div class="grp"><label for="month-metric" class="lbl">Darstellung</label>
+        <select id="month-metric">
+          <option value="yield">Ertrag [kWh]</option>
+          <option value="spec">Spezifischer Ertrag [kWh/kWp]</option>
+          <option value="pr">Performance Ratio [%]</option>
+          <option value="poa">Einstrahlung Modulebene, nach Anteilen [kWh/m²]</option>
+          <option value="ghi">Einstrahlung horizontal vs. Modulebene [kWh/m²]</option>
+        </select></div>
+      <div class="grp"><button class="btn" data-csv="monthly" type="button" disabled>⬇ CSV</button></div>
+    </div>
+    <div id="chart-month" class="chart"></div>
+    <div class="tablewrap" id="tbl-month"></div>
+  </section>
+
+  <!-- Tageswerte -->
+  <section class="panel panel-card" id="p-day">
+    <div class="toolbar">
+      <div class="grp"><label for="day-metric" class="lbl">Darstellung</label>
+        <select id="day-metric">
+          <option value="yield">Ertrag [kWh]</option>
+          <option value="spec">Spezifischer Ertrag [kWh/kWp]</option>
+          <option value="pr">Performance Ratio [%]</option>
+          <option value="ghi">Einstrahlung horizontal vs. Modulebene [kWh/m²]</option>
+        </select></div>
+      <div class="grp"><button class="btn" data-csv="daily" type="button" disabled>⬇ CSV</button></div>
+    </div>
+    <div id="chart-day" class="chart"></div>
+    <div class="tablewrap" id="tbl-day"></div>
+  </section>
+
+  <!-- Stundenwerte -->
+  <section class="panel panel-card" id="p-hour">
+    <div class="toolbar">
+      <div class="grp">
+        <label for="h-start" class="lbl">Ab</label><input type="date" id="h-start">
+        <button class="chip on" data-span="7" type="button">1 Woche</button>
+        <button class="chip" data-span="31" type="button">1 Monat</button>
+        <button class="chip" data-span="92" type="button">3 Monate</button>
+        <button class="chip" data-span="0" type="button">Ganzes Jahr</button>
+      </div>
+      <div class="grp"><button class="btn" data-csv="hourly" type="button" disabled>⬇ CSV</button></div>
+    </div>
+    <div id="chart-hour" class="chart tall"></div>
+    <p class="note">Zeitachse in Standardzeit des Standorts (ohne Sommerzeit); Zeitstempel = Beginn der Stunde. Zoomen per Auswahl, Navigieren mit dem Schieberegler unten.</p>
+    <div class="tablewrap" id="tbl-hour"></div>
+    <p class="note" id="hour-note"></p>
+  </section>
+
+  <!-- Heatmap -->
+  <section class="panel panel-card" id="p-heat">
+    <div class="toolbar"><div class="grp"><b>Ertrag je Stunde und Tag</b><span class="hint">[Wh/kWp] – Stunde = Beginn des Intervalls, Standardzeit</span></div></div>
+    <div id="chart-heat" class="chart tall"></div>
+  </section>
+</main>
+</div>
+
+<footer>Rechenkern: pvlib (Sonnenstand NREL-SPA, Perez-Modell, SAPM, PVWatts). Wetterdaten: DWD-Testreferenzjahre (TRY) bzw. Open-Meteo/ERA5. Ergebnisse sind Prognosen, keine Garantie.<br><span style="display:inline-block;margin-top:8px">Credits: Prof. Dr. Manuel Lämmle auf Vorlage des Excel-Rechners von Prof. Dr. Henrik te Heesen, Umwelt-Campus Birkenfeld, Institut für Betriebs- und Technologiemanagement (IBT). Erstellt für das Modul „Erneuerbare Energie“ im Studiengang Sustainable Business Development.</span></footer>
+
+<!-- ========================= PYTHON-MODELL (pvlib) ========================= -->
+<script type="text/x-python" id="pv-model">
+"""PV-Ertragsmodell auf Basis von pvlib (läuft lokal und im Browser via Pyodide).
+
+Ablauf:
+  1. Wetterdaten laden  (load_try_csv / load_openmeteo)   -> Zustand in _STATE
+  2. simulate(params_json)                                   -> JSON-String mit allen Ergebnissen
+  3. get_csv(kind) / get_xlsx()                              -> Downloads
+
+Zeitkonvention: Alle Zeitreihen werden intern in UTC geführt. Der Index bezeichnet den *Beginn* der
+Stunde; Sonnenstand wird für die Stundenmitte berechnet. Tages-/Monatswerte werden in der
+Standardzeit des Standorts (UTC+utc_offset, ohne Sommerzeit) aggregiert.
+"""
+import io
+import json
+
+import numpy as np
+import pandas as pd
+import pvlib
+
+_STATE = {"wx": None, "meta": None, "solpos_key": None, "solpos": None, "result": None}
+
+MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August",
+          "September", "Oktober", "November", "Dezember"]
+
+# Montageart -> (Excel-ΔT in K, SAPM-Parametersatz)
+MONTAGE = {
+    "aufdach_parallel": {"label": "Aufdach – parallel, gut hinterlüftet", "dT": 29, "sapm": "close_mount_glass_glass"},
+    "indach_hinterlueftet": {"label": "Indach – hinterlüftet", "dT": 32, "sapm": "close_mount_glass_glass"},
+    "indach_gedaemmt": {"label": "Indach – nicht hinterlüftet", "dT": 43, "sapm": "insulated_back_glass_polymer"},
+    "aufgestaendert_dach": {"label": "Aufgeständert – Flachdach", "dT": 28, "sapm": "open_rack_glass_glass"},
+    "aufgestaendert_frei": {"label": "Aufgeständert – Freifläche", "dT": 22, "sapm": "open_rack_glass_glass"},
+}
+
+
+def montage_options():
+    return json.dumps({k: v["label"] for k, v in MONTAGE.items()}, ensure_ascii=False)
+
+
+# ----------------------------------------------------------------------------------------------
+# Wetterdaten
+# ----------------------------------------------------------------------------------------------
+def _store_weather(df, meta):
+    df = df.copy()
+    df["pressure_pa"] = df["pressure_pa"].fillna(101325.0)
+    for c in ("temp_air", "wind_speed"):
+        df[c] = df[c].interpolate(limit_direction="both")
+    df[["bhi", "dhi"]] = df[["bhi", "dhi"]].fillna(0.0).clip(lower=0.0)
+    _STATE.update(wx=df, meta=meta, solpos_key=None, solpos=None, result=None)
+    return json.dumps({"hours": int(len(df)), **meta}, ensure_ascii=False)
+
+
+def load_try_csv(csv_text, year=2015, utc_offset=1, name="TRY"):
+    """DWD-TRY (aus convert_try_to_csv.py): Spalten bhi, dhi, temp_air, wind_speed, pressure_hpa, ...
+
+    TRY-Zeit = MEZ, Stundenwert HH = Mittel der vorangegangenen Stunde -> Intervallbeginn in UTC
+    = Jahresbeginn(MEZ) + (HH-1)h - utc_offset.
+    """
+    raw = pd.read_csv(io.StringIO(csv_text))
+    n = len(raw)
+    start_local = pd.Timestamp(year=int(year), month=1, day=1, hour=0)
+    idx = pd.date_range(start_local - pd.Timedelta(hours=utc_offset), periods=n, freq="h", tz="UTC")
+    df = pd.DataFrame({
+        "bhi": raw["bhi"].astype(float).values, "dhi": raw["dhi"].astype(float).values,
+        "temp_air": raw["temp_air"].astype(float).values,
+        "wind_speed": raw["wind_speed"].astype(float).values,
+        "pressure_pa": raw["pressure_hpa"].astype(float).values * 100.0,
+    }, index=idx)
+    return _store_weather(df, {"source": f"DWD-Testreferenzjahr {name}", "utc_offset": int(utc_offset),
+                               "year_label": "Testreferenzjahr (mittleres Jahr 1995–2012)"})
+
+
+def load_openmeteo(json_text, utc_offset=None):
+    """Open-Meteo Archive-API (timezone=GMT, wind in m/s). Zeitstempel = Ende der Stunde."""
+    j = json.loads(json_text)
+    h = j["hourly"]
+    t_end = pd.to_datetime(h["time"])
+    idx = (t_end - pd.Timedelta(hours=1)).tz_localize("UTC")
+    df = pd.DataFrame({
+        "bhi": pd.to_numeric(pd.Series(h["direct_radiation"]), errors="coerce").values,
+        "dhi": pd.to_numeric(pd.Series(h["diffuse_radiation"]), errors="coerce").values,
+        "temp_air": pd.to_numeric(pd.Series(h["temperature_2m"]), errors="coerce").values,
+        "wind_speed": pd.to_numeric(pd.Series(h["wind_speed_10m"]), errors="coerce").values,
+        "pressure_pa": pd.to_numeric(pd.Series(h["surface_pressure"]), errors="coerce").values * 100.0,
+    }, index=idx)
+    lon = float(j.get("longitude", 0.0))
+    off = int(round(lon / 15.0)) if utc_offset is None else int(utc_offset)
+    return _store_weather(df, {"source": "Open-Meteo (ERA5/ERA5-Land-Reanalyse)", "utc_offset": off,
+                               "year_label": str(df.index[len(df) // 2].year),
+                               "elevation": j.get("elevation")})
+
+
+# ----------------------------------------------------------------------------------------------
+# Modell
+# ----------------------------------------------------------------------------------------------
+def _solpos(lat, lon, alt):
+    key = (round(lat, 5), round(lon, 5), round(alt, 1))
+    if _STATE["solpos_key"] != key:
+        wx = _STATE["wx"]
+        mid = wx.index + pd.Timedelta(minutes=30)
+        sp = pvlib.solarposition.get_solarposition(
+            mid, lat, lon, altitude=alt, pressure=wx["pressure_pa"].values, temperature=wx["temp_air"].values)
+        sp.index = wx.index
+        _STATE["solpos"], _STATE["solpos_key"] = sp, key
+    return _STATE["solpos"]
+
+
+def _num(p, key, default):
+    v = p.get(key, default)
+    return default if v is None or v == "" else float(v)
+
+
+def simulate(params_json):
+    p = json.loads(params_json)
+    wx, meta = _STATE["wx"], _STATE["meta"]
+    if wx is None:
+        raise ValueError("Keine Wetterdaten geladen.")
+
+    lat, lon, alt = _num(p, "lat", 48.0), _num(p, "lon", 8.0), _num(p, "altitude", 0.0)
+    tilt, azim = _num(p, "tilt", 30.0), _num(p, "azimuth", 180.0)
+    albedo, derating, gamma = _num(p, "albedo", 0.2), _num(p, "derating", 0.85), _num(p, "temp_coeff", -0.35)
+    mode = p.get("model", "pvlib")  # 'pvlib' | 'excel'
+    montage = MONTAGE.get(p.get("mounting"), MONTAGE["aufdach_parallel"])
+
+    if p.get("power_mode") == "area":
+        area, eta = _num(p, "area", 20.0), _num(p, "efficiency", 20.0)
+        pnom_kw = area * eta / 100.0  # 1 kW/m² (STC)
+    else:
+        pnom_kw = _num(p, "power_kwp", 10.0)
+        area, eta = None, None
+    if pnom_kw <= 0:
+        raise ValueError("Die Anlagenleistung muss größer 0 sein.")
+
+    sp = _solpos(lat, lon, alt)
+    zen, azs = sp["apparent_zenith"], sp["azimuth"]
+    cosz = np.cos(np.radians(sp["zenith"]))
+    ghi = wx["bhi"] + wx["dhi"]
+
+    # DNI aus direkter Horizontalstrahlung; bei sehr flachem Sonnenstand (cos z < 0.05)
+    # wird alles als diffus gewertet (Energie bleibt erhalten).
+    ok = (cosz > 0.05) & (wx["bhi"] > 0)
+    dni_extra = pd.Series(pvlib.irradiance.get_extra_radiation(wx.index), index=wx.index)
+    dni = pd.Series(np.where(ok, wx["bhi"] / cosz.where(cosz > 0.05, 1.0), 0.0), index=wx.index)
+    dni = np.minimum(dni, dni_extra)
+    dhi = wx["dhi"].where(ok, ghi)
+
+    aoi = pvlib.irradiance.aoi(tilt, azim, zen, azs)
+
+    if mode == "excel":
+        poa = pvlib.irradiance.get_total_irradiance(tilt, azim, zen, azs, dni, ghi, dhi,
+                                                    albedo=albedo, model="isotropic")
+    else:
+        am = pvlib.atmosphere.get_relative_airmass(zen)
+        poa = pvlib.irradiance.get_total_irradiance(
+            tilt, azim, zen, azs, dni, ghi, dhi, dni_extra=dni_extra, airmass=am, albedo=albedo,
+            model="perez", model_perez="allsitescomposite1990")
+    poa = poa.fillna(0.0).clip(lower=0.0)
+    direct = poa["poa_direct"].where(zen < 90, 0.0).clip(lower=0.0)
+    sky, ground = poa["poa_sky_diffuse"], poa["poa_ground_diffuse"]
+
+    # Reflexionsverluste (IAM) nur in der pvlib-Variante
+    if mode == "excel" or not p.get("iam", True):
+        eff = direct + sky + ground
+    else:
+        iam_b = pvlib.iam.physical(aoi, n=1.526, K=4.0, L=0.002).fillna(0.0)
+        iam_d = pvlib.iam.marion_diffuse("physical", tilt, n=1.526, K=4.0, L=0.002)
+        eff = direct * iam_b + sky * float(iam_d["sky"]) + ground * float(iam_d["ground"])
+    poa_global = direct + sky + ground
+
+    # Zelltemperatur
+    if mode == "excel":
+        tcell = wx["temp_air"] + montage["dT"] * poa_global / 1000.0
+    else:
+        prm = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS["sapm"][montage["sapm"]]
+        tcell = pvlib.temperature.sapm_cell(poa_global, wx["temp_air"], wx["wind_speed"],
+                                            prm["a"], prm["b"], prm["deltaT"])
+
+    # Gleichstromleistung (PVWatts) mit Derating (Wechselrichter, Verkabelung, Verschmutzung ...)
+    pdc = pvlib.pvsystem.pvwatts_dc(eff, tcell, pnom_kw * 1000.0, gamma / 100.0, temp_ref=25.0) * derating
+    pdc = pdc.clip(lower=0.0).where(eff > 0, 0.0)
+
+    # ---------------- Ergebnisse -------------------------------------------------------------
+    off = int(meta.get("utc_offset", 1))
+    tzname = f"Etc/GMT{-off:+d}" if off != 0 else "UTC"
+    local = wx.index.tz_convert(tzname)
+    tz_label = "UTC" if off == 0 else f"UTC{off:+d}"
+
+    h = pd.DataFrame({
+        "ghi": ghi, "bhi": wx["bhi"], "dhi": wx["dhi"], "dni": dni,
+        "poa": poa_global, "poa_dir": direct, "poa_dif": sky, "poa_ref": ground, "poa_eff": eff,
+        "t_amb": wx["temp_air"], "t_cell": tcell, "wind": wx["wind_speed"],
+        "sun_el": 90 - sp["apparent_zenith"], "sun_az": sp["azimuth"], "aoi": aoi,
+        "p_w": pdc,
+    })
+    h["p_w"] = h["p_w"].fillna(0.0)
+    h.index = local
+    h["month"], h["date"], h["hour"] = h.index.month, h.index.normalize().tz_localize(None), h.index.hour
+    h["yield_wh"] = h["p_w"]  # Stundenmittel [W] * 1 h = [Wh]
+    h["tcw"] = h["t_cell"] * h["poa"]
+
+    def agg(g):
+        return pd.DataFrame({
+            "ghi_kwh_m2": g["ghi"].sum() / 1000.0,
+            "poa_kwh_m2": g["poa"].sum() / 1000.0,
+            "poa_dir": g["poa_dir"].sum() / 1000.0,
+            "poa_dif": g["poa_dif"].sum() / 1000.0,
+            "poa_ref": g["poa_ref"].sum() / 1000.0,
+            "yield_kwh": g["yield_wh"].sum() / 1000.0,
+            "t_amb": g["t_amb"].mean(),
+            # einstrahlungsgewichtete Zelltemperatur (Tage ohne Einstrahlung: einfacher Mittelwert)
+            "t_cell": (g["tcw"].sum() / g["poa"].sum().where(g["poa"].sum() > 0)).fillna(g["t_cell"].mean()),
+        })
+
+    def finish(d):
+        d["spec_yield"] = d["yield_kwh"] / pnom_kw
+        d["pr"] = np.where(d["poa_kwh_m2"] > 0, d["spec_yield"] / d["poa_kwh_m2"] * 100.0, np.nan)
+        return d
+
+    gm, gd = h.groupby("month"), h.groupby("date")
+    monthly = finish(agg(gm))
+    daily = finish(agg(gd))
+    monthly.index = [MONATE[m - 1] for m in monthly.index]
+
+    # Jahreskennzahlen
+    ghi_y, poa_y = h["ghi"].sum() / 1000.0, h["poa"].sum() / 1000.0
+    yield_y = h["yield_wh"].sum() / 1000.0
+    spec = yield_y / pnom_kw
+    pk = h["p_w"].idxmax()
+    best, worst = monthly["yield_kwh"].idxmax(), monthly["yield_kwh"].idxmin()
+    dbest = daily["yield_kwh"].idxmax()
+    sun = h["poa"] > 0
+    nh = float(len(h))
+    kpi = {
+        "power_kwp": pnom_kw, "area_m2": area, "efficiency_pct": eta, "hours": int(nh),
+        "yield_kwh": yield_y, "spec_yield": spec, "pr_pct": spec / poa_y * 100.0 if poa_y > 0 else 0.0,
+        "capacity_factor_pct": spec / nh * 100.0, "full_load_h": spec,
+        "ghi_kwh_m2": ghi_y, "poa_kwh_m2": poa_y,
+        "poa_dir": h["poa_dir"].sum() / 1000.0, "poa_dif": h["poa_dif"].sum() / 1000.0,
+        "poa_ref": h["poa_ref"].sum() / 1000.0,
+        "transposition_gain_pct": (poa_y / ghi_y - 1) * 100.0 if ghi_y > 0 else 0.0,
+        "iam_loss_pct": (1 - h["poa_eff"].sum() / h["poa"].sum()) * 100.0 if poa_y > 0 else 0.0,
+        "t_amb_mean": h["t_amb"].mean(),
+        "t_cell_mean_sun": float(np.average(h["t_cell"][sun], weights=h["poa"][sun])) if sun.any() else float("nan"),
+        "t_cell_max": h["t_cell"].max(),
+        "peak_kw": h["p_w"].max() / 1000.0, "peak_time": pk.strftime("%d.%m. %H:%M"),
+        "specific_peak": h["p_w"].max() / 1000.0 / pnom_kw,
+        "best_month": best, "best_month_kwh": float(monthly.loc[best, "yield_kwh"]),
+        "worst_month": worst, "worst_month_kwh": float(monthly.loc[worst, "yield_kwh"]),
+        "best_day": dbest.strftime("%d.%m."), "best_day_kwh": float(daily.loc[dbest, "yield_kwh"]),
+        "summer_share_pct": float(monthly.loc[["April", "Mai", "Juni", "Juli", "August", "September"],
+                                              "yield_kwh"].sum() / yield_y * 100.0) if yield_y > 0 else 0.0,
+        "tz_label": tz_label, "source": meta["source"], "year_label": meta["year_label"],
+    }
+
+    heat = h.pivot_table(index="date", columns="hour", values="yield_wh", aggfunc="sum").reindex(columns=range(24))
+    heat = (heat / 1000.0 / pnom_kw * 1000.0).fillna(0.0)  # Wh/kWp je Stunde
+
+    # Tabellen für Anzeige und Download
+    fmt = "%Y-%m-%d %H:%M"
+    hourly = pd.DataFrame({
+        f"Zeit (UTC)": wx.index.strftime(fmt),
+        f"Zeit ({tz_label})": local.strftime(fmt),
+        "GHI [W/m²]": h["ghi"].values, "Direkt horiz. [W/m²]": h["bhi"].values, "Diffus horiz. [W/m²]": h["dhi"].values,
+        "Sonnenhöhe [°]": h["sun_el"].values, "Sonnenazimut [°]": h["sun_az"].values, "Einfallswinkel [°]": h["aoi"].values,
+        "Einstrahlung Modulebene [Wh/m²]": h["poa"].values,
+        "  davon direkt [Wh/m²]": h["poa_dir"].values, "  davon diffus [Wh/m²]": h["poa_dif"].values,
+        "  davon reflektiert [Wh/m²]": h["poa_ref"].values,
+        "Umgebungstemperatur [°C]": h["t_amb"].values, "Windgeschwindigkeit [m/s]": h["wind"].values,
+        "Zelltemperatur [°C]": h["t_cell"].values,
+        "Ertrag [Wh]": h["yield_wh"].values, "Spez. Ertrag [Wh/kWp]": (h["yield_wh"] / pnom_kw).values,
+    }).round(3)
+    daily_t = pd.DataFrame({
+        "Datum": daily.index.strftime("%Y-%m-%d"),
+        "Einstrahlung horizontal [kWh/m²]": daily["ghi_kwh_m2"].values,
+        "Einstrahlung Modulebene [kWh/m²]": daily["poa_kwh_m2"].values,
+        "Ertrag [kWh]": daily["yield_kwh"].values, "Spez. Ertrag [kWh/kWp]": daily["spec_yield"].values,
+        "Performance Ratio [%]": daily["pr"].values,
+        "Ø Umgebungstemperatur [°C]": daily["t_amb"].values,
+    }).round(3)
+    monthly_t = pd.DataFrame({
+        "Monat": monthly.index,
+        "Einstrahlung horizontal [kWh/m²]": monthly["ghi_kwh_m2"].values,
+        "Einstrahlung Modulebene [kWh/m²]": monthly["poa_kwh_m2"].values,
+        "  davon direkt [kWh/m²]": monthly["poa_dir"].values, "  davon diffus [kWh/m²]": monthly["poa_dif"].values,
+        "  davon reflektiert [kWh/m²]": monthly["poa_ref"].values,
+        "Ertrag [kWh]": monthly["yield_kwh"].values, "Spez. Ertrag [kWh/kWp]": monthly["spec_yield"].values,
+        "Performance Ratio [%]": monthly["pr"].values,
+        "Ø Umgebungstemperatur [°C]": monthly["t_amb"].values, "Ø Zelltemperatur [°C]": monthly["t_cell"].values,
+    }).round(3)
+
+    inputs = {
+        "Datenquelle": meta["source"], "Wetterjahr": meta["year_label"], "Breitengrad [°]": lat, "Längengrad [°]": lon,
+        "Höhe [m ü. NN]": alt, "Neigung [°]": tilt, "Azimut [°] (0=N, 90=O, 180=S, 270=W)": azim,
+        "Nennleistung [kWp]": round(pnom_kw, 4), "Modulfläche [m²]": area, "Modulwirkungsgrad [%]": eta,
+        "Temperaturkoeffizient [%/K]": gamma, "Derating-Faktor [-]": derating, "Albedo [-]": albedo,
+        "Montageart": montage["label"],
+        "Modellvariante": "pvlib-Standard (Perez, SAPM, IAM, PVWatts)" if mode != "excel"
+        else "Excel-kompatibel (isotrop, ΔT-Modell)",
+        "Reflexionsverluste (IAM)": "ja" if (mode != "excel" and p.get("iam", True)) else "nein",
+        "pvlib-Version": pvlib.__version__,
+    }
+    kpi_rows = _kpi_table(kpi)
+
+    _STATE["result"] = {"hourly": hourly, "daily": daily_t, "monthly": monthly_t, "kpi": kpi_rows, "inputs": inputs}
+
+    def col(df, c, nd=3):
+        return [None if pd.isna(v) else round(float(v), nd) for v in df[c].values]
+
+    out = {
+        "kpi": {k: (None if isinstance(v, float) and np.isnan(v) else (round(v, 4) if isinstance(v, float) else v))
+                for k, v in kpi.items()},
+        "kpi_rows": kpi_rows,
+        "monthly": {
+            "labels": list(monthly.index),
+            **{c: col(monthly, c) for c in ["ghi_kwh_m2", "poa_kwh_m2", "poa_dir", "poa_dif", "poa_ref",
+                                            "yield_kwh", "spec_yield", "pr", "t_amb", "t_cell"]},
+        },
+        "daily": {
+            "dates": list(daily.index.strftime("%Y-%m-%d")),
+            **{c: col(daily, c) for c in ["ghi_kwh_m2", "poa_kwh_m2", "yield_kwh", "spec_yield", "pr", "t_amb"]},
+        },
+        "hourly": {
+            "t_local": list(local.strftime("%Y-%m-%d %H:%M")),
+            **{c: col(h, c, 2) for c in ["ghi", "poa", "t_amb", "t_cell", "wind", "sun_el", "p_w"]},
+        },
+        "heat": {"dates": list(heat.index.strftime("%Y-%m-%d")), "z": np.round(heat.values, 1).tolist()},
+        "tables": {
+            "hourly_cols": list(hourly.columns), "daily_cols": list(daily_t.columns),
+            "monthly_cols": list(monthly_t.columns),
+            "monthly_rows": monthly_t.astype(object).where(monthly_t.notna(), None).values.tolist(),
+            "daily_rows": daily_t.astype(object).where(daily_t.notna(), None).values.tolist(),
+            "hourly_preview": hourly.head(240).astype(object).where(hourly.head(240).notna(), None).values.tolist(),
+        },
+    }
+    return json.dumps(out, ensure_ascii=False)
+
+
+def _kpi_table(k):
+    """Jahreskennzahlen als Liste (Gruppe, Name, Wert, Einheit) – wie Results!R:T im Excel."""
+    def r(v, n=1):
+        return None if v is None or (isinstance(v, float) and np.isnan(v)) else round(float(v), n)
+    rows = [
+        ("Ertrag", "Jahresertrag", r(k["yield_kwh"], 0), "kWh"),
+        ("Ertrag", "Spezifischer Ertrag", r(k["spec_yield"], 0), "kWh/kWp"),
+        ("Ertrag", "Performance Ratio", r(k["pr_pct"], 1), "%"),
+        ("Ertrag", "Kapazitätsfaktor (Jahresnutzungsgrad)", r(k["capacity_factor_pct"], 1), "%"),
+        ("Ertrag", "Spitzenleistung", r(k["peak_kw"], 2), "kW"),
+        ("Ertrag", "Zeitpunkt der Spitzenleistung", k["peak_time"], ""),
+        ("Ertrag", "Bester Monat", f'{k["best_month"]} ({k["best_month_kwh"]:.0f} kWh)', ""),
+        ("Ertrag", "Schwächster Monat", f'{k["worst_month"]} ({k["worst_month_kwh"]:.0f} kWh)', ""),
+        ("Ertrag", "Ertragreichster Tag", f'{k["best_day"]} ({k["best_day_kwh"]:.1f} kWh)', ""),
+        ("Ertrag", "Anteil Sommerhalbjahr (Apr–Sep)", r(k["summer_share_pct"], 0), "%"),
+        ("Einstrahlung", "Globalstrahlung horizontal", r(k["ghi_kwh_m2"], 0), "kWh/m²"),
+        ("Einstrahlung", "Globalstrahlung in Modulebene", r(k["poa_kwh_m2"], 0), "kWh/m²"),
+        ("Einstrahlung", "  davon direkt", r(k["poa_dir"], 0), "kWh/m²"),
+        ("Einstrahlung", "  davon diffus", r(k["poa_dif"], 0), "kWh/m²"),
+        ("Einstrahlung", "  davon reflektiert", r(k["poa_ref"], 0), "kWh/m²"),
+        ("Einstrahlung", "Gewinn durch Neigung/Ausrichtung", r(k["transposition_gain_pct"], 1), "%"),
+        ("Einstrahlung", "Reflexionsverluste (IAM)", r(k["iam_loss_pct"], 1), "%"),
+        ("Temperatur", "Ø Umgebungstemperatur", r(k["t_amb_mean"], 1), "°C"),
+        ("Temperatur", "Ø Zelltemperatur (einstrahlungsgewichtet)", r(k["t_cell_mean_sun"], 1), "°C"),
+        ("Temperatur", "Max. Zelltemperatur", r(k["t_cell_max"], 1), "°C"),
+        ("Anlage", "Nennleistung", r(k["power_kwp"], 2), "kWp"),
+    ]
+    if k.get("area_m2"):
+        rows += [("Anlage", "Modulfläche", r(k["area_m2"], 1), "m²"), ("Anlage", "Modulwirkungsgrad", r(k["efficiency_pct"], 1), "%")]
+    return rows
+
+
+# ----------------------------------------------------------------------------------------------
+# Downloads
+# ----------------------------------------------------------------------------------------------
+def get_csv(kind):
+    """kind: hourly | daily | monthly -> CSV (Semikolon, Dezimalkomma, UTF-8 mit BOM für Excel-DE)."""
+    df = _STATE["result"][kind]
+    return df.to_csv(sep=";", decimal=",", index=False)
+
+
+def get_xlsx():
+    r = _STATE["result"]
+    buf = io.BytesIO()
+    kpi = pd.DataFrame(r["kpi"], columns=["Gruppe", "Kennzahl", "Wert", "Einheit"])
+    inp = pd.DataFrame({"Parameter": list(r["inputs"].keys()), "Wert": [("" if v is None else v) for v in r["inputs"].values()]})
+    with pd.ExcelWriter(buf, engine="openpyxl") as xw:
+        inp.to_excel(xw, sheet_name="Eingaben", index=False)
+        kpi.to_excel(xw, sheet_name="Jahreswerte", index=False)
+        r["monthly"].to_excel(xw, sheet_name="Monatswerte", index=False)
+        r["daily"].to_excel(xw, sheet_name="Tageswerte", index=False)
+        r["hourly"].to_excel(xw, sheet_name="Stundenwerte", index=False)
+        for ws in xw.book.worksheets:
+            for c in ws.columns:
+                ws.column_dimensions[c[0].column_letter].width = min(46, max(12, len(str(c[0].value)) + 2))
+            ws.freeze_panes = "A2"
+    return buf.getvalue()
+
+</script>
+
+<script>
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const C = { ink: '#1a1a1a', ink2: '#52514e', muted: '#898781', grid: '#e1e0d9', axis: '#c3c2b7',
+  blue: '#2a78d6', orange: '#eb6834', aqua: '#1baf7a', yellow: '#eda100', violet: '#6250d6', red: '#e34948' };
+const PVLIB_VERSION = '0.16.1';
+
+let py = null, STANDORTE = [], res = null, running = false, rerun = false, timer = null;
+const csvCache = new Map(), wxCache = new Map();
+let wxLoaded = null;           // Schlüssel der aktuell in Python geladenen Wetterdaten
+let activeTab = 'year';
+const dirty = new Set();
+
+/* ---------------- Hilfsfunktionen ---------------- */
+const fmt = (v, d = 0) => (v === null || v === undefined || Number.isNaN(v)) ? '–'
+  : Number(v).toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
+const num = id => parseFloat($('#' + id).value);
+function setStatus(txt, kind = '') { const s = $('#status'); s.className = 'status ' + kind; $('#status-txt').textContent = txt; }
+function setOverlay(msg, pct) { $('#ov-msg').textContent = msg; $('#ov-bar').style.width = pct + '%'; }
+function download(name, data, type) {
+  const url = URL.createObjectURL(new Blob(data, { type }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: name });
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+const DIRS = ['Nord','Nordnordost','Nordost','Ostnordost','Ost','Ostsüdost','Südost','Südsüdost','Süd','Südsüdwest','Südwest','Westsüdwest','West','Westnordwest','Nordwest','Nordnordwest'];
+const dirName = a => DIRS[Math.round((((a % 360) + 360) % 360) / 22.5) % 16];
+
+/* ---------------- Modul-Skizze (SVG) ---------------- */
+function sideSvg(tilt) {
+  const b = tilt * Math.PI / 180, P = { x: 232, y: 150 }, L = 140;
+  const E = { x: P.x - L * Math.cos(b), y: P.y - L * Math.sin(b) };
+  const M = { x: (P.x + E.x) / 2, y: (P.y + E.y) / 2 };
+  const n = { x: Math.sin(b), y: -Math.cos(b) };          // Modulnormale (zeigt zur Sonnenseite)
+  const N2 = { x: M.x + n.x * 46, y: M.y + n.y * 46 };
+  let ticks = '';
+  for (let i = 1; i < 6; i++) {
+    const t = i / 6, q = { x: P.x + (E.x - P.x) * t, y: P.y + (E.y - P.y) * t };
+    ticks += `<line x1="${q.x - n.x * 4}" y1="${q.y - n.y * 4}" x2="${q.x + n.x * 4}" y2="${q.y + n.y * 4}" stroke="#9ec5f4" stroke-width="1.2"/>`;
+  }
+  const r = 44, arcEnd = { x: P.x - r * Math.cos(b), y: P.y - r * Math.sin(b) };
+  const arc = tilt > 0.5 ? `<path d="M ${P.x - r} ${P.y} A ${r} ${r} 0 0 1 ${arcEnd.x} ${arcEnd.y}" fill="none" stroke="${C.orange}" stroke-width="2"/>
+     <text x="${P.x - 74 * Math.cos(b / 2) - 6}" y="${P.y - 74 * Math.sin(b / 2) + (tilt < 14 ? -4 : 4)}" font-size="15" font-style="italic" fill="${C.orange}" font-weight="600">β</text>` : '';
+  const leg = tilt > 3 ? `<line x1="${E.x}" y1="${E.y}" x2="${E.x}" y2="150" stroke="#b9b8ad" stroke-width="4"/>` : '';
+  const sun = (() => { const s = { x: 268, y: 36 }; let rays = '';
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; rays += `<line x1="${s.x + Math.cos(a) * 13}" y1="${s.y + Math.sin(a) * 13}" x2="${s.x + Math.cos(a) * 19}" y2="${s.y + Math.sin(a) * 19}" stroke="${C.yellow}" stroke-width="2" stroke-linecap="round"/>`; }
+    return `<circle cx="${s.x}" cy="${s.y}" r="9" fill="${C.yellow}"/>${rays}`; })();
+  return `<svg viewBox="0 0 300 175" role="img" aria-label="Seitenansicht: Neigung ${tilt}°">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${C.ink2}"/></marker></defs>
+    <line x1="10" y1="150" x2="290" y2="150" stroke="${C.line}" stroke-width="2"/>
+    <line x1="${P.x - L - 6}" y1="150" x2="${P.x + 6}" y2="150" stroke="${C.muted}" stroke-width="1.2" stroke-dasharray="4 3"/>
+    ${leg}
+    <line x1="${P.x}" y1="${P.y}" x2="${E.x}" y2="${E.y}" stroke="${C.blue}" stroke-width="9" stroke-linecap="butt"/>
+    <line x1="${P.x}" y1="${P.y}" x2="${E.x}" y2="${E.y}" stroke="#1c5cab" stroke-width="3" transform="translate(${-n.x * 3},${-n.y * 3})"/>
+    ${ticks}${arc}
+    <line x1="${M.x}" y1="${M.y}" x2="${N2.x}" y2="${N2.y}" stroke="${C.ink2}" stroke-width="1.6" marker-end="url(#ah)"/>
+    ${sun}
+    <text x="12" y="168" font-size="11" fill="${C.muted}">Seitenansicht</text>
+  </svg>`;
+}
+function topSvg(az) {
+  const c = { x: 100, y: 88 }, R = 62, a = az * Math.PI / 180;
+  const pt = (rad, ang) => ({ x: c.x + rad * Math.sin(ang), y: c.y - rad * Math.cos(ang) });
+  const s = pt(34, 0), e = pt(34, a), large = az % 360 > 180 ? 1 : 0;
+  const arc = (az % 360) > 1 ? `<path d="M ${s.x} ${s.y} A 34 34 0 ${large} 1 ${e.x} ${e.y}" fill="none" stroke="${C.orange}" stroke-width="2"/>` : '';
+  const lab = pt(47, a / 2), cardinals = [['N', 0], ['O', 90], ['S', 180], ['W', 270]]
+    .map(([t, d]) => { const p = pt(R + 12, d * Math.PI / 180); return `<text x="${p.x}" y="${p.y + 4}" text-anchor="middle" font-size="12" font-weight="600" fill="${t === 'S' ? C.ink : C.ink2}">${t}</text>`; }).join('');
+  return `<svg viewBox="0 0 200 175" role="img" aria-label="Draufsicht: Azimut ${az}°">
+    <circle cx="${c.x}" cy="${c.y}" r="${R}" fill="#fff" stroke="${C.line}" stroke-width="1.5"/>
+    <line x1="${c.x}" y1="${c.y - R}" x2="${c.x}" y2="${c.y}" stroke="${C.muted}" stroke-width="1.2" stroke-dasharray="4 3"/>
+    ${arc}${cardinals}
+    <g transform="translate(${c.x},${c.y}) rotate(${az})">
+      <rect x="-26" y="-13" width="52" height="26" rx="2" fill="${C.blue}"/>
+      <rect x="-26" y="-13" width="52" height="5" rx="2" fill="#9ec5f4"/>
+      <line x1="0" y1="-13" x2="0" y2="-47" stroke="${C.ink2}" stroke-width="1.6" marker-end="url(#ah2)"/>
+    </g>
+    <defs><marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="${C.ink2}"/></marker></defs>
+    ${az % 360 > 1 ? `<text x="${lab.x}" y="${lab.y + 4}" text-anchor="middle" font-size="14" font-style="italic" font-weight="600" fill="${C.orange}">α</text>` : ''}
+    <text x="8" y="168" font-size="11" fill="${C.muted}">Draufsicht</text>
+  </svg>`;
+}
+function updateSketch() {
+  const t = Math.min(90, Math.max(0, num('tilt') || 0)), a = Math.min(360, Math.max(0, num('az') || 0));
+  $('#svg-side').innerHTML = sideSvg(t); $('#svg-top').innerHTML = topSvg(a);
+  $('#cap-side').innerHTML = `Neigung <b>β = ${fmt(t)}°</b>`;
+  $('#cap-top').innerHTML = `Azimut <b>α = ${fmt(a)}°</b> · ${dirName(a)}`;
+  $$('#az-chips .chip').forEach(c => c.classList.toggle('on', Number(c.dataset.az) === Math.round(a)));
+}
+
+/* ---------------- Eingaben ---------------- */
+function readParams() {
+  const errs = [];
+  const chk = (id, lo, hi, label) => { const el = $('#' + id), v = parseFloat(el.value);
+    const ok = Number.isFinite(v) && v >= lo && v <= hi; el.classList.toggle('bad', !ok); if (!ok) errs.push(`${label}: ${lo} … ${hi}`); return v; };
+  const p = {
+    lat: chk('lat', -90, 90, 'Breite'), lon: chk('lon', -180, 180, 'Länge'), altitude: chk('alt', -500, 9000, 'Höhe'),
+    tilt: chk('tilt', 0, 90, 'Neigung'), azimuth: chk('az', 0, 360, 'Azimut'),
+    temp_coeff: chk('gamma', -1.5, 0, 'Temperaturkoeffizient'), derating: chk('derating', 0.5, 1, 'Derating'),
+    albedo: chk('albedo', 0, 1, 'Albedo'),
+    model: $('input[name=model]:checked').value, mounting: $('#mount').value, iam: $('#iam').checked,
+    power_mode: $('input[name=pm]:checked').value,
+  };
+  if (p.power_mode === 'kwp') p.power_kwp = chk('kwp', 0.01, 1e6, 'Leistung');
+  else { p.area = chk('area', 0.1, 1e7, 'Fläche'); p.efficiency = chk('eta', 1, 100, 'Wirkungsgrad'); }
+  return { p, errs };
+}
+function updateKwpCalc() {
+  const a = num('area'), e = num('eta');
+  $('#kwp-calc').textContent = (a > 0 && e > 0) ? `= ${fmt(a * e / 100, 2)} kWp  (Fläche × Wirkungsgrad × 1 kW/m²)` : '';
+}
+
+/* ---------------- Wetterdaten ---------------- */
+// Daten werden als <script>-Dateien geladen (geht auch bei file://); die Standalone-Variante hat sie bereits eingebettet.
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const el = document.createElement('script'); el.src = src;
+    el.onload = res; el.onerror = () => rej(new Error('Datei nicht ladbar: ' + src));
+    document.head.appendChild(el);
+  });
+}
+async function getStandorte() {
+  if (!window.PV_STANDORTE) await loadScript('data/standorte.js');
+  return window.PV_STANDORTE;
+}
+async function getCsv(s) {
+  if (!(window.PV_CSV && window.PV_CSV[s.file])) await loadScript(s.file.replace(/\.csv$/, '.js'));
+  return window.PV_CSV[s.file];
+}
+async function loadSource() {
+  const val = $('#src').value;
+  $('#custom-box').hidden = val !== 'custom';
+  if (val === 'custom') {
+    $('#src-hint').textContent = 'Eigener Standort: Wetterdaten über Open-Meteo (ERA5), stündlich, frei verfügbar.';
+    if (wxLoaded && wxLoaded.startsWith('om:')) return scheduleRun(); // schon Daten da
+    $('#wx-hint').textContent = 'Koordinaten eingeben bzw. Ort suchen, dann „Wetterdaten abrufen“.';
+    return;
+  }
+  const s = STANDORTE.find(x => x.name === val);
+  $('#lat').value = s.lat; $('#lon').value = s.lon; $('#alt').value = s.altitude; updateSketch();
+  $('#src-hint').textContent = `DWD-Testreferenzjahr (mittleres Jahr 1995–2012), ${s.name}. Koordinaten wirken auf den Sonnenstand; Wetterdaten bleiben die des Datensatzes.`;
+  setStatus(`Lade Wetterdaten ${s.name} …`, 'busy');
+  try {
+    const txt = await getCsv(s);
+    py.globals.get('load_try_csv')(txt, s.year, s.utc_offset, s.name);
+    wxLoaded = 'try:' + s.name; scheduleRun(0);
+  } catch (e) { fail(e, 'Die Wetterdatei konnte nicht geladen werden. Liegt der Ordner „data“ neben der HTML-Datei? Alternativ die Datei pvlib_simulator_standalone.html verwenden.'); }
+}
+async function fetchOpenMeteo() {
+  const lat = num('lat'), lon = num('lon'), year = $('#wx-year').value;
+  if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) { $('#wx-hint').textContent = 'Bitte gültige Koordinaten eingeben.'; $('#wx-hint').className = 'hint err'; return; }
+  const key = `om:${lat.toFixed(3)},${lon.toFixed(3)},${year}`;
+  $('#wx-hint').className = 'hint'; $('#wx-hint').textContent = 'Rufe Open-Meteo ab …'; $('#wx-fetch').disabled = true;
+  setStatus('Rufe Wetterdaten von Open-Meteo ab …', 'busy');
+  try {
+    let txt = wxCache.get(key);
+    if (!txt) {
+      const u = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${year}-01-01&end_date=${year}-12-31`
+        + `&hourly=temperature_2m,direct_radiation,diffuse_radiation,wind_speed_10m,surface_pressure&wind_speed_unit=ms&timezone=GMT`;
+      const r = await fetch(u); const t = await r.text();
+      if (!r.ok) throw new Error('Open-Meteo: ' + (JSON.parse(t).reason || r.status));
+      txt = t; wxCache.set(key, txt);
+    }
+    const info = JSON.parse(py.globals.get('load_openmeteo')(txt));
+    if (info.elevation != null) $('#alt').value = Math.round(info.elevation);
+    wxLoaded = key; $('#wx-hint').textContent = `Geladen: ${info.hours} Stunden, Jahr ${year} (Höhe ${fmt(info.elevation)} m aus Gelände­modell).`;
+    scheduleRun(0);
+  } catch (e) { $('#wx-hint').className = 'hint err'; $('#wx-hint').textContent = String(e.message || e); fail(e); }
+  finally { $('#wx-fetch').disabled = false; }
+}
+async function geocode() {
+  const q = $('#geo-q').value.trim(); if (!q) return;
+  const box = $('#geo-res'); box.textContent = 'Suche …';
+  try {
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=de&format=json`);
+    const j = await r.json(); box.innerHTML = '';
+    if (!j.results) { box.textContent = 'Kein Treffer.'; return; }
+    j.results.forEach(o => { const b = document.createElement('button'); b.type = 'button';
+      b.textContent = `${o.name}${o.admin1 ? ', ' + o.admin1 : ''}, ${o.country || ''} (${o.latitude.toFixed(3)}, ${o.longitude.toFixed(3)})`;
+      b.onclick = () => { $('#lat').value = o.latitude.toFixed(4); $('#lon').value = o.longitude.toFixed(4); if (o.elevation != null) $('#alt').value = Math.round(o.elevation); box.innerHTML = '';
+        $('#wx-hint').textContent = 'Koordinaten übernommen – jetzt „Wetterdaten abrufen“.'; $('#wx-hint').className = 'hint'; };
+      box.appendChild(b); });
+  } catch (e) { box.textContent = 'Suche fehlgeschlagen: ' + e.message; }
+}
+
+/* ---------------- Rechnen ---------------- */
+function scheduleRun(delay = 220) { clearTimeout(timer); timer = setTimeout(run, delay); }
+async function run() {
+  if (!py || !wxLoaded) return;
+  if (running) { rerun = true; return; }
+  const { p, errs } = readParams();
+  if (errs.length) { setStatus('Bitte Eingaben prüfen – ' + errs.join(' · '), 'err'); return; }
+  const custom = $('#src').value === 'custom';
+  if (custom && !wxLoaded.startsWith('om:')) { setStatus('Bitte zuerst Wetterdaten abrufen.', 'err'); return; }
+  running = true; setStatus('Berechne …', 'busy');
+  await new Promise(r => setTimeout(r, 15));       // UI atmen lassen
+  try {
+    const t0 = performance.now();
+    res = JSON.parse(py.globals.get('simulate')(JSON.stringify(p)));
+    const y0 = res.daily.dates[0].slice(0, 4); if (!$('#h-start').value.startsWith(y0)) $('#h-start').value = y0 + '-06-15';
+    const dt = performance.now() - t0;
+    setStatus(`Berechnet in ${fmt(dt / 1000, 2)} s · ${fmt(res.kpi.hours)} Stunden · ${res.kpi.source}`, '');
+    $$('[data-csv], #dl-xlsx, #dl-kpi').forEach(b => b.disabled = false);
+    renderTiles(); ['year', 'month', 'day', 'hour', 'heat'].forEach(t => dirty.add(t)); renderTab(activeTab);
+  } catch (e) { fail(e); }
+  finally { running = false; if (rerun) { rerun = false; scheduleRun(0); } }
+}
+function fail(e, extra = '') {
+  console.error(e); const m = String(e.message || e).split('\n').filter(Boolean).slice(-1)[0];
+  setStatus('Fehler: ' + m + (extra ? ' – ' + extra : ''), 'err');
+}
+
+/* ---------------- Darstellung ---------------- */
+function renderTiles() {
+  const k = res.kpi;
+  const T = (kk, v, u, s) => `<div class="tile"><div class="k">${kk}</div><div class="v">${v}<small>${u}</small></div><div class="s">${s}</div></div>`;
+  $('#tiles').innerHTML =
+    T('Jahresertrag', fmt(k.yield_kwh), 'kWh', `bei ${fmt(k.power_kwp, 2)} kWp`) +
+    T('Spezifischer Ertrag', fmt(k.spec_yield), 'kWh/kWp', `${fmt(k.full_load_h)} Volllaststunden`) +
+    T('Performance Ratio', fmt(k.pr_pct, 1), '%', `Kapazitätsfaktor ${fmt(k.capacity_factor_pct, 1)} %`) +
+    T('Einstrahlung Modulebene', fmt(k.poa_kwh_m2), 'kWh/m²', `${k.transposition_gain_pct >= 0 ? '+' : ''}${fmt(k.transposition_gain_pct, 1)} % ggü. horizontal (${fmt(k.ghi_kwh_m2)})`);
+}
+function table(el, cols, rows, decs) {
+  const th = cols.map(c => `<th>${c.trim()}</th>`).join('');
+  const body = rows.map(r => '<tr>' + r.map((v, i) => `<td>${typeof v === 'number' ? fmt(v, decs[i] ?? 1) : (v ?? '–')}</td>`).join('') + '</tr>').join('');
+  el.innerHTML = `<table class="data"><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table>`;
+}
+const CFG = { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] };
+function baseLayout(extra = {}) {
+  return Object.assign({
+    font: { family: 'system-ui,-apple-system,"Segoe UI",sans-serif', size: 12, color: C.ink2 },
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', separators: ',.',
+    margin: { l: 66, r: 14, t: 34, b: 50 },
+    hoverlabel: { bgcolor: '#fff', bordercolor: C.axis, font: { color: C.ink, size: 12 } },
+    legend: { orientation: 'h', x: 0, y: 1.14, font: { color: C.ink2 } },
+    xaxis: { gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, zeroline: false },
+    yaxis: { gridcolor: C.grid, linecolor: 'rgba(0,0,0,0)', tickfont: { color: C.ink2 }, zeroline: false, title: { font: { color: C.ink2 } } },
+  }, extra);
+}
+const bar = (x, y, name, color, unit, d = 1, extra = {}) => Object.assign({
+  type: 'bar', x, y, name, marker: { color }, hovertemplate: `%{x}<br><b>%{y:,.${d}f}</b> ${unit}<extra>${name}</extra>` }, extra);
+
+let theoryDone = false;
+function renderTheory(tries = 0) {   // Formeln (KaTeX) einmalig setzen; KaTeX lädt asynchron vom CDN
+  if (theoryDone) return;
+  if (!window.renderMathInElement) { if (tries < 40) setTimeout(() => renderTheory(tries + 1), 250); return; }
+  renderMathInElement($('#p-theory'), { delimiters: [{ left: '\\[', right: '\\]', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false });
+  theoryDone = true;
+}
+function renderTab(t) {
+  if (!res || !dirty.has(t)) return; dirty.delete(t);
+  const k = res.kpi, tb = res.tables;
+  if (t === 'year') {
+    $('#year-sub').textContent = `${k.source} · ${k.year_label}`;
+    const groups = {}; res.kpi_rows.forEach(r => (groups[r[0]] ||= []).push(r));
+    $('#kpi-groups').innerHTML = Object.entries(groups).map(([g, rows]) => `<div class="kpi-group"><h3>${g}</h3><table>` +
+      rows.map(r => `<tr><td>${r[1].replace(/^ {2}/, '&nbsp;&nbsp;&nbsp;')}</td><td class="n">${typeof r[2] === 'number' ? fmt(r[2], Number.isInteger(r[2]) ? 0 : (Math.abs(r[2]) < 10 ? 2 : 1)) : r[2]}</td><td class="u">${r[3]}</td></tr>`).join('') + '</table></div>').join('');
+    const m = $('#methods'); const ex = $('input[name=model]:checked').value === 'excel';
+    m.innerHTML = [
+      'Sonnenstand: pvlib NREL-SPA für die Stundenmitte; Zeitreihen intern in UTC.',
+      'Direktstrahlung (horizontal) → DNI über cos(Zenitwinkel); bei Sonnenhöhe < 3° wird alles als diffus gewertet.',
+      ex ? 'Transposition: isotropes Himmelsmodell (wie im Excel-Tool). Zelltemperatur: T<sub>Umgebung</sub> + ΔT·G/1000 je Montageart.'
+         : 'Transposition: Perez (allsitescomposite1990). Zelltemperatur: SAPM mit Windgeschwindigkeit. Reflexionsverluste: IAM nach Fresnel/Snell (n = 1,526).',
+      'Leistung: PVWatts-DC, P = P<sub>nom</sub>·G<sub>eff</sub>/1000·(1 + γ·(T<sub>Zelle</sub> − 25 °C))·Derating.',
+      'Tages-/Monatswerte in Standardzeit des Standorts (' + k.tz_label + '). Wetter: ' + k.source + '.',
+    ].map(s => `<li>${s}</li>`).join('');
+  }
+  if (t === 'month') {
+    const m = res.monthly, x = m.labels, v = $('#month-metric').value, L = baseLayout({ barmode: 'stack', bargap: .3 });
+    let tr;
+    if (v === 'yield') { tr = [bar(x, m.yield_kwh, 'Ertrag', C.blue, 'kWh', 0)]; L.yaxis.title.text = 'Ertrag [kWh]'; }
+    if (v === 'spec') { tr = [bar(x, m.spec_yield, 'Spez. Ertrag', C.blue, 'kWh/kWp', 1)]; L.yaxis.title.text = 'Spezifischer Ertrag [kWh/kWp]'; }
+    if (v === 'pr') { tr = [bar(x, m.pr, 'Performance Ratio', C.blue, '%', 1)]; L.yaxis.title.text = 'Performance Ratio [%]'; }
+    if (v === 'poa') { tr = [bar(x, m.poa_dir, 'direkt', C.orange, 'kWh/m²', 1, { marker: { color: C.orange, line: { color: '#fff', width: 1.5 } } }),
+        bar(x, m.poa_dif, 'diffus', C.aqua, 'kWh/m²', 1, { marker: { color: C.aqua, line: { color: '#fff', width: 1.5 } } }),
+        bar(x, m.poa_ref, 'reflektiert', C.yellow, 'kWh/m²', 1, { marker: { color: C.yellow, line: { color: '#fff', width: 1.5 } } })]; L.yaxis.title.text = 'Einstrahlung Modulebene [kWh/m²]'; }
+    if (v === 'ghi') { L.barmode = 'group'; tr = [bar(x, m.ghi_kwh_m2, 'horizontal', C.muted, 'kWh/m²', 1), bar(x, m.poa_kwh_m2, 'Modulebene', C.orange, 'kWh/m²', 1)]; L.yaxis.title.text = 'Einstrahlung [kWh/m²]'; }
+    L.showlegend = tr.length > 1; if (tr.length > 1) L.legend.y = 1.14;
+    if (v === 'pr') L.yaxis.rangemode = 'tozero';
+    Plotly.react('chart-month', tr, L, CFG);
+    table($('#tbl-month'), tb.monthly_cols, tb.monthly_rows, [0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1]);
+  }
+  if (t === 'day') {
+    const d = res.daily, x = d.dates, v = $('#day-metric').value, L = baseLayout({ bargap: .15, barmode: 'group' });
+    let tr;
+    if (v === 'yield') { tr = [bar(x, d.yield_kwh, 'Ertrag', C.blue, 'kWh', 1)]; L.yaxis.title.text = 'Ertrag [kWh]'; }
+    if (v === 'spec') { tr = [bar(x, d.spec_yield, 'Spez. Ertrag', C.blue, 'kWh/kWp', 2)]; L.yaxis.title.text = 'Spezifischer Ertrag [kWh/kWp]'; }
+    if (v === 'pr') { tr = [bar(x, d.pr, 'Performance Ratio', C.blue, '%', 1)]; L.yaxis.title.text = 'Performance Ratio [%]'; }
+    if (v === 'ghi') { tr = [bar(x, d.ghi_kwh_m2, 'horizontal', C.muted, 'kWh/m²', 2), bar(x, d.poa_kwh_m2, 'Modulebene', C.orange, 'kWh/m²', 2)]; L.yaxis.title.text = 'Einstrahlung [kWh/m²]'; }
+    L.showlegend = tr.length > 1;
+    L.xaxis.rangeslider = { visible: true, thickness: .07 }; L.xaxis.type = 'date';
+    L.xaxis.rangeselector = { buttons: [{ count: 1, label: '1 M', step: 'month', stepmode: 'backward' }, { count: 3, label: '3 M', step: 'month', stepmode: 'backward' },
+      { count: 6, label: '6 M', step: 'month', stepmode: 'backward' }, { step: 'all', label: 'Jahr' }], font: { color: C.ink2 }, bgcolor: '#fafafa', activecolor: '#e8f1fc' };
+    L.margin.b = 40;
+    Plotly.react('chart-day', tr, L, CFG);
+    table($('#tbl-day'), tb.daily_cols, tb.daily_rows, [0, 2, 2, 1, 2, 1, 1]);
+  }
+  if (t === 'hour') {
+    const h = res.hourly, x = h.t_local;
+    const line = (y, name, color, unit, ax, extra = {}) => Object.assign({ type: 'scatter', mode: 'lines', x, y, name, xaxis: 'x' + ax[0], yaxis: 'y' + ax[1],
+      line: { color, width: 1.4 }, hovertemplate: `%{y:,.1f} ${unit}<extra>${name}</extra>` }, extra);
+    const tr = [
+      line(h.p_w, 'Ertrag', C.blue, 'Wh', ['', ''], { fill: 'tozeroy', fillcolor: 'rgba(42,120,214,.16)', hovertemplate: '%{y:,.0f} Wh<extra>Ertrag</extra>' }),
+      line(h.poa, 'Einstrahlung Modulebene', C.orange, 'W/m²', ['2', '2']),
+      line(h.ghi, 'Einstrahlung horizontal', C.muted, 'W/m²', ['2', '2']),
+      line(h.t_amb, 'Umgebungstemperatur', C.violet, '°C', ['3', '3']),
+      line(h.t_cell, 'Zelltemperatur', C.red, '°C', ['3', '3']),
+    ];
+    const ax = (dom, title) => ({ domain: dom, gridcolor: C.grid, linecolor: 'rgba(0,0,0,0)', zeroline: false, tickfont: { color: C.ink2 }, title: { text: title, font: { color: C.ink2 } } });
+    const L = baseLayout({ hovermode: 'x unified', margin: { l: 70, r: 14, t: 34, b: 40 },
+      xaxis: { anchor: 'y', matches: 'x3', showticklabels: false, gridcolor: C.grid, linecolor: C.axis },
+      xaxis2: { anchor: 'y2', matches: 'x3', showticklabels: false, gridcolor: C.grid, linecolor: C.axis },
+      xaxis3: { anchor: 'y3', type: 'date', gridcolor: C.grid, linecolor: C.axis, tickfont: { color: C.ink2 }, title: { text: `Zeit (${k.tz_label}, Standardzeit)`, font: { color: C.ink2 } }, rangeslider: { visible: true, thickness: .06 } },
+      yaxis: ax([.72, 1], 'Ertrag [Wh]'), yaxis2: ax([.38, .66], 'Einstrahlung [W/m²]'), yaxis3: ax([.08, .32], 'Temperatur [°C]') });
+    L.legend = { orientation: 'h', x: 0, y: 1.07, font: { color: C.ink2 } };
+    L.yaxis.rangemode = 'tozero'; L.yaxis2.rangemode = 'tozero';
+    setHourRange(L);
+    Plotly.react('chart-hour', tr, L, CFG);
+    table($('#tbl-hour'), tb.hourly_cols, tb.hourly_preview, tb.hourly_cols.map(() => 1));
+    $('#hour-note').textContent = `Vorschau: erste ${tb.hourly_preview.length} von ${fmt(k.hours)} Stunden – der CSV-/Excel-Download enthält alle Stunden.`;
+  }
+  if (t === 'heat') {
+    const hm = res.heat;
+    const L = baseLayout({ margin: { l: 56, r: 10, t: 14, b: 40 } });
+    const yr = hm.dates[0].slice(0, 4), mn = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+    L.xaxis = Object.assign(L.xaxis, { type: 'date', tickvals: mn.map((_, i) => `${yr}-${String(i + 1).padStart(2, '0')}-16`), ticktext: mn });
+    L.yaxis = Object.assign(L.yaxis, { title: { text: 'Stunde des Tages (Beginn des Intervalls)', font: { color: C.ink2 } }, dtick: 2, range: [-0.5, 23.5] });
+    const zt = Array.from({ length: 24 }, (_, h) => hm.z.map(row => row[h]));   // Stunde × Tag
+    Plotly.react('chart-heat', [{ type: 'heatmap', x: hm.dates, y: [...Array(24).keys()], z: zt, hoverongaps: false,
+      colorscale: [[0, '#f4f8fd'], [.12, '#cde2fb'], [.3, '#86b6ef'], [.5, '#3987e5'], [.7, '#1c5cab'], [1, '#0d366b']],
+      colorbar: { title: { text: 'Wh/kWp', side: 'top' }, thickness: 12, tickfont: { color: C.ink2 } },
+      hovertemplate: '%{x|%d.%m.}  %{y}:00 Uhr<br><b>%{z:,.0f}</b> Wh/kWp<extra></extra>' }], L, CFG);
+  }
+}
+function setHourRange(L) {
+  const start = $('#h-start').value; const span = Number($('#p-hour .chip.on')?.dataset.span ?? 7);
+  if (!start || !span) return;
+  const a = new Date(start + 'T00:00:00Z'), b = new Date(a.getTime() + span * 864e5);
+  const f = d => d.toISOString().slice(0, 16).replace('T', ' ');
+  L.xaxis3.range = [f(a), f(b)];
+}
+
+/* ---------------- Downloads ---------------- */
+function baseName() {
+  const k = res.kpi, src = $('#src').value === 'custom' ? `lat${num('lat').toFixed(2)}_lon${num('lon').toFixed(2)}` : $('#src').value;
+  return `pv_${src}_${Math.round(k.power_kwp * 100) / 100}kWp_${Math.round(num('tilt'))}grad_az${Math.round(num('az'))}`;
+}
+function downloadCsv(kind) {
+  const names = { hourly: 'stundenwerte', daily: 'tageswerte', monthly: 'monatswerte' };
+  const txt = py.globals.get('get_csv')(kind);
+  download(`${baseName()}_${names[kind]}.csv`, ['﻿', txt], 'text/csv;charset=utf-8');
+}
+function downloadKpi() {
+  const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const rows = [['Gruppe', 'Kennzahl', 'Wert', 'Einheit'], ...res.kpi_rows.map(r => [r[0], r[1].trim(), typeof r[2] === 'number' ? String(r[2]).replace('.', ',') : r[2], r[3]])];
+  download(`${baseName()}_jahreswerte.csv`, ['﻿', rows.map(r => r.map(q).join(';')).join('\n')], 'text/csv;charset=utf-8');
+}
+async function downloadXlsx() {
+  const b = $('#dl-xlsx'); const old = b.textContent; b.disabled = true; b.textContent = 'Erzeuge Excel-Datei …';
+  try {
+    if (!py.globals.get('_xlsx_ready')) { await py.runPythonAsync("import micropip\nawait micropip.install('openpyxl')\n_xlsx_ready = True"); }
+    const proxy = py.globals.get('get_xlsx')(); const bytes = proxy.toJs(); proxy.destroy();
+    download(`${baseName()}.xlsx`, [bytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  } catch (e) { fail(e); } finally { b.textContent = old; b.disabled = false; }
+}
+
+/* ---------------- Start ---------------- */
+async function initPython() {
+  setOverlay('Python-Laufzeit (Pyodide) wird geladen …', 8);
+  py = await loadPyodide();
+  setOverlay('numpy, pandas, scipy werden geladen …', 30);
+  await py.loadPackage(['numpy', 'pandas', 'scipy', 'micropip']);
+  setOverlay(`pvlib ${PVLIB_VERSION} wird installiert …`, 62);
+  await py.runPythonAsync(`import micropip\nawait micropip.install('pvlib==${PVLIB_VERSION}')`);
+  setOverlay('Modell wird initialisiert …', 88);
+  py.runPython($('#pv-model').textContent);
+  return py;
+}
+async function init() {
+  updateSketch(); updateKwpCalc();
+  const yr = $('#wx-year'); for (let y = new Date().getFullYear() - 1; y >= 2005; y--) yr.add(new Option(y, y)); yr.value = '2023';
+  const d0 = $('#h-start'); d0.value = '2015-06-15';
+  try {
+    const [ , meta] = await Promise.all([initPython(), getStandorte()]);
+    STANDORTE = meta;
+  } catch (e) {
+    $('#ov-err').textContent = 'Fehler beim Start: ' + e.message + ' – Liegt der Ordner „data“ neben der HTML-Datei? Sonst bitte pvlib_simulator_standalone.html verwenden. (Python/pvlib werden aus dem Internet geladen.)';
+    console.error(e); return;
+  }
+  const sel = $('#src'); const g1 = document.createElement('optgroup'); g1.label = 'DWD-Testreferenzjahr (TRY)';
+  STANDORTE.forEach(s => g1.appendChild(new Option(s.name, s.name)));
+  const g2 = document.createElement('optgroup'); g2.label = 'Weitere Standorte (Online-Abruf)'; g2.appendChild(new Option('Eigener Standort (Open-Meteo)…', 'custom'));
+  sel.append(g1, g2); sel.value = 'Offenburg';
+  const mo = JSON.parse(py.globals.get('montage_options')()); const ms = $('#mount');
+  Object.entries(mo).forEach(([k, v]) => ms.add(new Option(v, k))); ms.value = 'aufdach_parallel';
+
+  // Ereignisse
+  $$('.inp').forEach(el => el.addEventListener('input', () => { if (el.id === 'tilt') $('#tilt-r').value = el.value; if (el.id === 'az') $('#az-r').value = el.value;
+    updateSketch(); updateKwpCalc(); scheduleRun(); }));
+  $('#tilt-r').addEventListener('input', e => { $('#tilt').value = e.target.value; updateSketch(); scheduleRun(); });
+  $('#az-r').addEventListener('input', e => { $('#az').value = e.target.value; updateSketch(); scheduleRun(); });
+  $$('#az-chips .chip').forEach(c => c.onclick = () => { $('#az').value = c.dataset.az; $('#az-r').value = c.dataset.az; updateSketch(); scheduleRun(0); });
+  $$('input[name=pm]').forEach(r => r.addEventListener('change', () => { const a = $('#pm-area').checked; $('#box-area').hidden = !a; $('#box-kwp').hidden = a; scheduleRun(0); }));
+  $$('input[name=model]').forEach(r => r.addEventListener('change', () => { const x = $('#m-excel').checked; $('#iam').disabled = x;
+    $('#model-hint').textContent = x ? 'Isotropes Himmelsmodell, Modultemperatur = Umgebung + ΔT·G/1000, keine IAM-Verluste – entspricht der Logik des Excel-Tools.'
+      : 'Perez-Transposition, SAPM-Zelltemperatur mit Wind, Reflexionsverluste (IAM), PVWatts.'; scheduleRun(0); }));
+  $('#src').addEventListener('change', loadSource);
+  $('#wx-fetch').onclick = fetchOpenMeteo; $('#geo-btn').onclick = geocode;
+  $('#geo-q').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); geocode(); } });
+  $$('#tabs .tab').forEach(b => b.onclick = () => { activeTab = b.dataset.tab; $$('#tabs .tab').forEach(x => x.setAttribute('aria-selected', x === b));
+    $$('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + activeTab)); renderTab(activeTab); if (activeTab === 'theory') renderTheory(); });
+  $('#month-metric').onchange = () => { dirty.add('month'); renderTab('month'); };
+  $('#day-metric').onchange = () => { dirty.add('day'); renderTab('day'); };
+  $$('[data-csv]').forEach(b => b.onclick = () => downloadCsv(b.dataset.csv));
+  $('#dl-kpi').onclick = downloadKpi; $('#dl-xlsx').onclick = downloadXlsx;
+  const applyHour = () => { const L = { xaxis3: {} }; setHourRange(L);
+    if (L.xaxis3.range) Plotly.relayout('chart-hour', { 'xaxis3.range': L.xaxis3.range }); else Plotly.relayout('chart-hour', { 'xaxis3.autorange': true }); };
+  $$('#p-hour .chip').forEach(c => c.onclick = () => { $$('#p-hour .chip').forEach(x => x.classList.toggle('on', x === c));
+    if (res) { const L = { xaxis3: {} }; setHourRange(L); L.xaxis3.range ? Plotly.relayout('chart-hour', { 'xaxis3.range': L.xaxis3.range }) : Plotly.relayout('chart-hour', { 'xaxis3.autorange': true }); } });
+  $('#h-start').addEventListener('change', applyHour);
+  window.addEventListener('resize', () => { const c = $('#chart-' + activeTab); if (c && c.data) Plotly.Plots.resize(c); });
+
+  $('#overlay').style.display = 'none';
+  await loadSource();
+}
+init();
+</script>
+</body>
+</html>
