@@ -2,5 +2,5 @@
 
 [Wind.sim](wind.sim/wind.sim.html): Wind-Ertragsberechner
 
-[HP Keymark Plots](hpkeymark/plot.html)
+[HP Keymark Plots](hpkeymark/index.html): Beitrag aus der HLH
 
