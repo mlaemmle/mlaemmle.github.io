@@ -1,0 +1,125 @@
+<!--| quarto-html-table-processing: none -->
+<table id="itables_29dfc61d_ed8c_4a8b_a6e0_604d51b80994">
+  <tbody>
+    <tr>
+      <td style="vertical-align:middle; text-align:left"><a href=https://mwouts.github.io/itables/><svg class="main-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+width="64" viewBox="0 0 500 400" style="font-family: 'Droid Sans', sans-serif;">
+    <g style="fill:#d9d7fc">
+        <path d="M100,400H500V357H100Z" />
+        <path d="M100,300H400V257H100Z" />
+        <path d="M0,200H400V157H0Z" />
+        <path d="M100,100H500V57H100Z" />
+        <path d="M100,350H500V307H100Z" />
+        <path d="M100,250H400V207H100Z" />
+        <path d="M0,150H400V107H0Z" />
+        <path d="M100,50H500V7H100Z" />
+    </g>
+    <g style="fill:#1a1366;stroke:#1a1366;">
+   <rect x="100" y="7" width="400" height="43">
+    <animate
+      attributeName="width"
+      values="0;400;0"
+      dur="5s"
+      repeatCount="indefinite" />
+      <animate
+      attributeName="x"
+      values="100;100;500"
+      dur="5s"
+      repeatCount="indefinite" />
+  </rect>
+        <rect x="0" y="107" width="400" height="43">
+    <animate
+      attributeName="width"
+      values="0;400;0"
+      dur="3.5s"
+      repeatCount="indefinite" />
+    <animate
+      attributeName="x"
+      values="0;0;400"
+      dur="3.5s"
+      repeatCount="indefinite" />
+  </rect>
+        <rect x="100" y="207" width="300" height="43">
+    <animate
+      attributeName="width"
+      values="0;300;0"
+      dur="3s"
+      repeatCount="indefinite" />
+    <animate
+      attributeName="x"
+      values="100;100;400"
+      dur="3s"
+      repeatCount="indefinite" />
+  </rect>
+        <rect x="100" y="307" width="400" height="43">
+    <animate
+      attributeName="width"
+      values="0;400;0"
+      dur="4s"
+      repeatCount="indefinite" />
+      <animate
+      attributeName="x"
+      values="100;100;500"
+      dur="4s"
+      repeatCount="indefinite" />
+  </rect>
+        <g style="fill:transparent;stroke-width:8; stroke-linejoin:round" rx="5">
+            <g transform="translate(45 50) rotate(-45)">
+                <circle r="33" cx="0" cy="0" />
+                <rect x="-8" y="32" width="16" height="30" />
+            </g>
+
+            <g transform="translate(450 152)">
+                <polyline points="-15,-20 -35,-20 -35,40 25,40 25,20" />
+                <rect x="-15" y="-40" width="60" height="60" />
+            </g>
+
+            <g transform="translate(50 352)">
+                <polygon points="-35,-5 0,-40 35,-5" />
+                <polygon points="-35,10 0,45 35,10" />
+            </g>
+
+            <g transform="translate(75 250)">
+                <polyline points="-30,30 -60,0 -30,-30" />
+                <polyline points="0,30 -30,0 0,-30" />
+            </g>
+
+            <g transform="translate(425 250) rotate(180)">
+                <polyline points="-30,30 -60,0 -30,-30" />
+                <polyline points="0,30 -30,0 0,-30" />
+            </g>
+        </g>
+    </g>
+</svg>
+</a>
+        Loading ITables v2.7.3 from the internet...
+        (need <a href=https://mwouts.github.io/itables/troubleshooting.html>help</a>?)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<link href="https://www.unpkg.com/dt_for_itables@2.5.1/dt_bundle.css" rel="stylesheet">
+<script type="module">
+    import { ITable, jQuery as $ } from 'https://www.unpkg.com/dt_for_itables@2.5.1/dt_bundle.js';
+
+    document.querySelectorAll("#itables_29dfc61d_ed8c_4a8b_a6e0_604d51b80994:not(.dataTable)").forEach(table => {
+        if (!(table instanceof HTMLTableElement))
+            return;
+
+        let dt_args = {
+          "classes": ["display", "nowrap", "compact", "cell-border", "stripe"],
+          "columnDefs": [{"render": "function (data, type, row, meta) { return type === 'sort' || type === 'type' ? data[1] : data[0]; }", "targets": [1, 2, 3, 4, 5, 6]}],
+          "data_json": "[[\"WP-Leistung bei 35 \\u00b0C [kWth]\", [\"11.9\", 11.9], [\"2.4\", 2.4], [\"5.6\", 5.6], [\"8.4\", 8.4], [\"11.6\", 11.6], [\"85.0\", 85.0]], [\"WP-Leistung bei 55 \\u00b0C [kWth]\", [\"13.3\", 13.3], [\"4.6\", 4.6], [\"6.0\", 6.0], [\"7.6\", 7.6], [\"11.5\", 11.5], [\"81.0\", 81.0]], [\"SCOP bei 35 \\u00b0C\", [\"4.7\", 4.7], [\"3.2\", 3.2], [\"4.5\", 4.5], [\"4.7\", 4.7], [\"5.0\", 5.0], [\"8.8\", 8.8]], [\"SCOP bei 55 \\u00b0C\", [\"3.5\", 3.5], [\"2.6\", 2.6], [\"3.3\", 3.3], [\"3.4\", 3.4], [\"3.6\", 3.6], [\"6.0\", 6.0]], [\"COP bei 35 \\u00b0C\", [\"4.1\", 4.1], [\"1.6\", 1.6], [\"3.1\", 3.1], [\"4.5\", 4.5], [\"4.8\", 4.8], [\"6.7\", 6.7]], [\"COP bei 55 \\u00b0C\", [\"3.0\", 3.0], [\"2.0\", 2.0], [\"2.8\", 2.8], [\"3.0\", 3.0], [\"3.1\", 3.1], [\"4.8\", 4.8]], [\"Schallpegel innen [dB(A)]\", [\"42.3\", 42.3], [\"-99.0\", -99.0], [\"40.0\", 40.0], [\"42.0\", 42.0], [\"46.0\", 46.0], [\"72.0\", 72.0]], [\"Schallpegel au\\u00dfen [dB(A)]\", [\"60.4\", 60.4], [\"0.0\", 0.0], [\"57.0\", 57.0], [\"60.0\", 60.0], [\"65.0\", 65.0], [\"93.0\", 93.0]], [\"Minimale Lufttemperatur TOL [\\u00b0C]\", [\"-11.9\", -11.9], [\"-28.0\", -28.0], [\"-10.0\", -10.0], [\"-10.0\", -10.0], [\"-10.0\", -10.0], [\"2.0\", 2.0]], [\"Maximale Wassertemperatur WTOL [\\u00b0C]\", [\"61.2\", 61.2], [\"33.0\", 33.0], [\"60.0\", 60.0], [\"60.0\", 60.0], [\"65.0\", 65.0], [\"80.0\", 80.0]]]",
+          "keys_to_be_evaluated": [["columnDefs", 0, "render"]],
+          "layout": {"bottomEnd": null, "bottomStart": null, "topEnd": null, "topStart": null},
+          "lengthMenu": [10, 25, 50, 100],
+          "order": [],
+          "pageLength": 25,
+          "scrollX": true,
+          "style": {"caption-side": "bottom", "margin": "0", "table-layout": "auto", "width": "auto"},
+          "table_html": "<table><thead>\n    <tr style=\"text-align: right;\">\n      \n      <th>Kenngr\u00f6\u00dfe</th>\n      <th>Mittelwert</th>\n      <th>Minimalwert</th>\n      <th>Q25 %</th>\n      <th>Q50 %</th>\n      <th>Q75 %</th>\n      <th>Maximalwert</th>\n    </tr>\n  </thead></table>",
+          "text_in_header_can_be_selected": true
+        };
+        new ITable(table, dt_args);
+    });
+</script>

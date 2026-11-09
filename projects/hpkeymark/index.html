@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datenbasierter Überblick zu Wärmepumpen-Kenndaten — Bericht</title>
+<meta name="description" content="Datenbasierte Auswertung von 2443 HeatPump Keymark-zertifizierten Wärmepumpenmodellen: Effizienz, Einsatzbereich und Umweltverträglichkeit.">
+<style>
+  :root{
+    --ink:#1b2420;
+    --paper:#f6f4ee;
+    --panel:#ffffff;
+    --line:#d8d3c4;
+    --accent:#2f6b4f;      /* tanne */
+    --accent-soft:#e4efe7;
+    --accent-2:#c2543a;    /* terracotta-rost, für sekundäre akzente */
+    --mono:#5c6259;
+    --shadow: 0 1px 2px rgba(27,36,32,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    line-height:1.6;
+    padding:0 0 4rem;
+  }
+
+  a{color:var(--accent-2); text-decoration:underline; text-decoration-color: var(--line);}
+  a:hover{color:var(--accent);}
+
+  header{
+    border-bottom:1px solid var(--line);
+    padding: 2.4rem 1.5rem 1.6rem;
+    max-width:860px;
+    margin:0 auto;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', 'Consolas', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 0.6rem;
+  }
+  .back-link{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.76rem;
+    color:var(--mono);
+    text-decoration:none;
+    display:inline-block;
+    margin-bottom:1.2rem;
+  }
+  .back-link:hover{color:var(--accent);}
+
+  h1.title{
+    font-family: Georgia, 'Iowan Old Style', serif;
+    font-weight:600;
+    font-size:clamp(1.6rem, 3.4vw, 2.3rem);
+    margin:0 0 0.7rem;
+    letter-spacing:-0.01em;
+  }
+  .dek{
+    font-family: Georgia, 'Iowan Old Style', serif;
+    font-style:italic;
+    color:var(--mono);
+    font-size:1.05rem;
+    max-width:680px;
+    margin:0 0 1.2rem;
+    line-height:1.5;
+  }
+  .byline{
+    font-size:0.86rem;
+    color:var(--mono);
+    margin:0;
+  }
+  .byline strong{ color:var(--ink); font-weight:600; }
+
+  main{
+    max-width:860px;
+    margin:0 auto;
+    padding:2.4rem 1.5rem 0;
+  }
+
+  main h2{
+    font-family: Georgia, 'Iowan Old Style', serif;
+    font-weight:600;
+    font-size:1.45rem;
+    color:var(--accent);
+    margin:2.6rem 0 1rem;
+    padding-bottom:0.5rem;
+    border-bottom:1px solid var(--line);
+  }
+  main h2:first-of-type{ margin-top:0.5rem; }
+
+  main p{
+    margin:0 0 1.1rem;
+    font-size:0.99rem;
+  }
+
+  main strong{ color:var(--ink); }
+
+  .formula{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.88rem;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:0.9rem 1.1rem;
+    margin:0 0 1.1rem;
+    overflow-x:auto;
+    color:var(--ink);
+  }
+
+  .viz-frame{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin:1.4rem 0 0.6rem;
+  }
+  .viz-frame iframe{
+    display:block;
+    width:100%;
+    height:500px;
+    border:none;
+  }
+  figcaption{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    color:var(--mono);
+    text-align:center;
+    margin:0.6rem 0 1.6rem;
+    padding:0 0.5rem;
+  }
+  figure{ margin:0 0 0.6rem; }
+
+  .author-block{
+    display:flex;
+    gap:1.2rem;
+    align-items:flex-start;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    padding:1.2rem 1.4rem;
+    margin:0 0 1.2rem;
+  }
+  .author-block img{
+    width:96px;
+    height:96px;
+    border-radius:8px;
+    object-fit:cover;
+    flex-shrink:0;
+  }
+  .author-block .author-name{
+    font-weight:600;
+    margin:0 0 0.2rem;
+  }
+  .author-block .author-source{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    color:var(--mono);
+    margin:0 0 0.5rem;
+  }
+  .author-block p.author-bio{
+    font-size:0.9rem;
+    margin:0;
+    color:var(--ink);
+  }
+
+  .lit-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    font-size:0.88rem;
+    color:var(--mono);
+  }
+  .lit-list li{
+    margin:0 0 0.9rem;
+    padding-left:1.6rem;
+    padding-top:0.3rem;
+    padding-bottom:0.3rem;
+    position:relative;
+    scroll-margin-top:1.5rem;
+    border-radius:6px;
+    transition: background 0.6s ease;
+  }
+  .lit-list li:target{
+    background:var(--accent-soft);
+  }
+  .lit-list li .num{
+    position:absolute;
+    left:0;
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--accent);
+  }
+  .lit-list a{ word-break:break-word; }
+  .back-to-text{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.74rem;
+    margin-left:0.5rem;
+    text-decoration:none;
+    color:var(--mono);
+    white-space:nowrap;
+  }
+  .back-to-text:hover{ color:var(--accent); }
+
+  .citation-ref{
+    text-decoration:none;
+    border-bottom:1px dotted var(--accent-2);
+    color:var(--accent-2);
+  }
+  .citation-ref:hover{ color:var(--accent); border-bottom-color:var(--accent); }
+
+  hr.section-rule{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:2.6rem 0;
+  }
+
+  footer{
+    max-width:860px;
+    margin:3rem auto 0;
+    padding:1.2rem 1.5rem 0;
+    border-top:1px solid var(--line);
+    font-size:0.78rem;
+    color:var(--mono);
+  }
+
+  @media (max-width:640px){
+    .author-block{ flex-direction:column; align-items:center; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="../index.html">← Zur Projektübersicht</a>
+  <p class="eyebrow">Wärmepumpen · 01 Bericht</p>
+  <h1 class="title">Datenbasierter Überblick zu Wärmepumpen-Kenndaten</h1>
+  <p class="dek">Wärmepumpen stehen im Zentrum der Wärmewende und sind eine Schlüsseltechnologie für die nachhaltige Gebäudetechnik. Doch wie schneiden die verfügbaren Modelle auf dem Markt hinsichtlich Effizienz, Einsatzbereich und Umweltverträglichkeit ab?</p>
+  <p class="byline"><strong>Text:</strong> Prof. Dr. Manuel Lämmle und Leroy Tomás</p>
+  <p class="byline"><strong>Visualisierungen:</strong> Alexander Severin, Alina Schlegel, Elias Folwaczny, Roland Kummer, Sebastian Engelhardt, Tasnim Alaref</p>
+</header>
+
+<main>
+
+  <p>In diesem Beitrag werfen wir einen datenbasierten Blick auf die technischen Kenndaten von 2443 Wärmepumpenmodelle, die ein HeatPump Keymark-Zertifikat erhalten haben. Mit Hilfe detaillierter Auswertungen von Wirkungsgrad, Jahresarbeitszahl, Kältemittel, Geräuschemissionen und Einsatzmöglichkeiten entsteht ein umfassender Überblick über den aktuellen Stand. Dieser liefert nicht nur repräsentative Werte, sondern bietet auch fundierte Einblicke für die Planung und Wärmepumpenauswahl.</p>
+
+  <h2>Datengrundlage</h2>
+  <p>Die untersuchten Kennwerte stammen aus der Heat Pump KEYMARK-Datenbank, die alle zertifizierten Produkte enthält <a class="citation-ref" id="ref1a" href="#quelle1">(EHPA, 2025)</a>. Das HP KEYMARK ist ein freiwilliges, unabhängiges europäisches Zertifizierungszeichen für Wärmepumpen, Kombinationswärmepumpen und Warmwasserbereiter. Es basiert auf unabhängigen Drittprüfungen und bestätigt die Einhaltung der Produktanforderungen gemäß den HP KEYMARK-Programmbestimmungen sowie der Effizienzanforderungen der Ökodesign-Richtlinien der EU nach Verordnung 813/2013 <a class="citation-ref" id="ref2a" href="#quelle2">(EU, 2013)</a>.</p>
+  <p>Die Kennwerte auf den Datenblätter des HP KEYMARK-Zertifikat basieren auf mehreren europäischen Normen, insbesondere auf DIN EN 14511 hinsichtlich Prüfbedingungen für elektrisch angetriebene Wärmepumpen sowie DIN EN 14825 zu Prüfmethoden für die saisonale Energieeffizienz und Ökodesign-Richtlinien von Wärmeerzeuger. In der Regel wird bei den Datenblattangaben zwischen Low- und Medium-Temperaturanwendung unterschieden: dies entspricht einer Heizwasser-Temperatur von 35 °C, vergleichbar mit einer Fußbodenheizung, bzw. einer Heiztemperatur von 55 °C, wie typisch für eine Radiatorheizung. Eine detaillierte Beschreibung der Datenblatt-Kennwerte sind in der EU Verordnung zu finden <a class="citation-ref" id="ref2b" href="#quelle2">(EU, 2013)</a>.</p>
+  <p>In Deutschland ist das HP KEYMARK-Zertifikat in der BAFA-Liste der förderfähigen Produkte enthalten, was bedeutet, dass Wärmepumpen mit diesem Zertifikat für staatliche Förderungen, wie das Marktanreizprogramm (MAP), anerkannt sind.</p>
+
+  <h2>Datenübersicht</h2>
+  <p>Die einzelnen Datenblatt-Kennwerte wurde am 30.01.2025 heruntergeladen, per Webscraping konvertiert und als maschinenlesbarer Datensatz gespeichert. In der Datenbank befinden sich zum Zeitpunkt des Datenabrufs insgesamt 182 Hersteller aus 22 Ländern mit 2443 individuellen Wärmepumpen-Typen. Damit stellt der Artikel eine aktualisierte Auswertung der Arbeiten von <a class="citation-ref" id="ref5a" href="#quelle5">(Oltersdorf et al., 2022)</a> aus dem Jahr 2022 dar.</p>
+  <p>Abbildung 1 zeigt drei Tortendiagramme, die eine erste Übersicht über die Daten liefern. China (17,6 %), Deutschland (16,8 %) und Frankreich (15,9 %) sind als Herstellerländer mit den meisten Wärmepumpen vertreten. Bezüglich der eingesetzten Kältemittel setzen mehr als die Hälfte R32 als Kältemittel ein, gefolgt von R410A und R290. Zur besseren Übersicht der Wärmepumpengröße wurden die Wärmepumpen in unterschiedliche Kategorien entsprechend ihrer Heizleistung eingruppiert. In der Leistungsklasse 5-10 kWth liegt mit 43,7 % der Großteil der Wärmepumpen. Dagegen haben nur 11,2 % der zertifizierten Wärmepumpen eine Heizleistung von mehr als 20 kWth. Somit lässt sich festhalten, dass es bei kleineren und mittleren Wärmepumpen bis 20 kWth eine große Auswahl an Modellen gibt, während der Markt für Keymark-zertifizierte Wärmepumpen mit einer Leistung von &gt; 20 kWth übersichtlicher ist.</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/Herstellerland1.html" loading="lazy"></iframe>
+    </div>
+    <div class="viz-frame">
+      <iframe src="visualisation/leistungsklasse1.html" loading="lazy"></iframe>
+    </div>
+    <div class="viz-frame">
+      <iframe src="visualisation/kaeltemittel1.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Abbildung 1: Anteil von WP-Modellen nach Herstellerland, Kältemittel und Leistungsklasse</figcaption>
+  </figure>
+
+  <p>Weitere Kategorien sind in Tabelle 1 zusammengefasst, jeweils unter Angabe der Anzahl an Wärmepumpen je Unterkategorie sowie der prozentuale Anteil. Daraus wird deutlich, dass 83 % aller Modelle Luft-Wasser-Wärmepumpen sind. Hinsichtlich der Bauweise werden 43 % als außenaufgestellter Monoblock-, 42 % als Split-, und 16 % als Innenaufstellte Geräte angeboten. 69 % aller Modelle sind reversibel betreibbar und können sowohl Heizen als auch Kühlen.</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/tabelle1.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Tabelle 1: Anzahl und prozentualer Anteil von Wärmepumpen-Modellen in unterschiedlichen Kategorien</figcaption>
+  </figure>
+
+  <h2>Leistung und Effizienz</h2>
+  <p>Die Leistung und Effizienz von Wärmepumpen werden in dem folgenden Abschnitt untersucht. Der SCOP (Seasonal Coefficient of Performance) gibt das Verhältnis von abgegebener Heizenergie zur aufgenommenen elektrischen Energie einer Wärmepumpe über eine Heizperiode unter realistischen, jahreszeitabhängigen Bedingungen an. Er ist damit ein geeigneter Kennwert um die Effizienzen der Wärmepumpen zu vergleichen.</p>
+  <p>Abbildung 1 zeigt die Saisonale Arbeitszahl SCOP in Abhängigkeit der Heizleistung jeweils bei einer Heiztemperatur von 35 °C, kategorisiert nach dem Wärmepumpen-Typ (Luft-Wasser-Wärmepumpe, Sole-Wasser und Wasser-Wasser-Wärmepumpe, und Sonstige Wärmepumpen). Brauchwasser-Wärmepumpen sind in der Übersicht nicht dargestellt, da für diese keine Nennleistung angegeben wird. Für eine bessere Darstellung der Heizleistung ist die x-Achse in logarithmischer Form aufgetragen. Zwischen dem SCOP und der Nennleistung ist kein direkter Zusammenhang feststellbar, d.h. die Effizienz ist in erster Linie unabhängig von der Wärmepumpen-Leistung. Jedoch zeichnet sich ab, dass Sole/Wasser und Wasser/Wasser-Wärmepumpen im Mittel deutlich effizienter sind als Luft-Wasser-Wärmepumpen.</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/keymark_scop_scatterplot.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Abbildung 2: Saisonale Arbeitszahl SCOP in Abhängigkeit der WP-Nennleistung bei einer Heiztemperatur von je 35 °C</figcaption>
+  </figure>
+
+  <p>Dieser Zusammenhang wird genauer in Abbildung 3 analysiert, in der Boxplots der saisonalen Arbeitszahl, sowohl bei 35 °C (Low) und bei 55 °C (Medium), dargestellt ist. Hieraus wir ersichtlich, dass im Mittel die Sole-Wasser und Wasser-Wasser Wärmepumpen einen um 0,6 Punkte höheren SCOP als Luft-Wasser-Wärmepumpen erzielen. Der Vergleich der niedrigen und mittleren Heiztemperaturen in grün und orange verdeutlicht die Wichtigkeit von möglichst niedrigen Heiztemperaturen: eine Reduktion der Heizkreistemperaturen von 55 °C auf 35 °C erhöht den SCOP um 1,2 Punkte von 3,4 auf 4,6 bei Luft-Wasser-Wärmepumpen. Dies entspricht langjährigen Monitoring-Ergebnissen des Fraunhofer ISE von Wärmepumpenanlagen im Feld (Vergleiche z.B. <a class="citation-ref" id="ref4a" href="#quelle4">(Lämmle et al., 2023)</a> und <a class="citation-ref" id="ref3a" href="#quelle3">(Günther, 2025)</a>).</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/bild3_neu.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Abbildung 3: SCOP bei 35°C und 55°C Heiztemperatur in Abhängigkeit von Wärmepumpen-Bauarten mit Angabe der Median-Werte</figcaption>
+  </figure>
+
+  <p>Kennfelder der Arbeitszahl COP (Coefficient of Performance) in Abhängigkeit der Quell- und Heiztemperatur sind in Abbildung 4 dargestellt, wobei dabei nur Luftwärmepumpen betrachtet werden. Die Arbeitszahl wird standardmäßig bei den vier Luft-Außentemperaturen T<sub>Luft</sub> = -7 °C, 2 °C, 7 °C und 12 °C und bei zwei Heizungs-Vorlauftemperaturen T<sub>VL</sub> = 35 °C und 55 °C charakterisiert. Die blauen und roten Punkte entsprechen jeweils den Betriebspunkten einer einzelnen Wärmepumpe. Durch die Ermittlung einer Regressionskurve können die mittleren COP-Kurven für Luftwärmepumpen in Abhängigkeit der Außentemperatur wie folgt berechnet werden:</p>
+
+  <div class="formula">
+    COP (T_VL = 35 °C) = 4,14 + 0,226 · T_Luft + 0,0091 · T_Luft²<br>
+    COP (T_VL = 55 °C) = 2,99 + 0,175 · T_Luft + 0,0079 · T_Luft²
+  </div>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/bild4_cop_kennfelder.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Abbildung 4: Durchschnittliche COP-Kennfelder von Luftwärmepumpen Regressionskurve und Vorhersageintervall mit einer 90 %-Wahrscheinlichkeit</figcaption>
+  </figure>
+
+  <h2>Minimal- und Maximaltemperaturen</h2>
+  <p>Neben den Arbeitszahlen ist eine Betrachtung der Einsatztemperaturen von besonderem Interesse. Dazu wird auf Datenblättern die TOL (temperature operating limit) angegeben, die die Mindest-Außentemperatur beschreibt, ab der ein Wärmepumpenbetrieb möglich ist. Unterhalb der Temperatur schalten Wärmepumpen ab. 83 % Wärmepumpenmodellen geben eine Mindest-Außentemperatur von TOL = -10 °C an. Für Außentemperaturen von -20 °C und noch geringer, sind 15 % der WP-Modelle geeignet.</p>
+  <p>Insbesondere bei Bestandsgebäuden ist eine ausreichend hohe Heizungswasser-Vorlauftemperaturen entscheidend. Auf dem Datenblatt ist dies unter WTOL (water temperature operating limit) zu finden. Hierbei zeichnet sich ein deutlicher Einfluss des Kältemittels ab, bei dem die Temperatur des kritischen Punktes maßgeblich die maximalen Einsatztemperaturen beeinflusst. Abbildung 5 vergleicht die maximalen Vorlauftemperaturen in Abhängigkeit der vier häufigsten Kältemittel. Im Durchschnitt erreichen R290-Wärmepumpen mit dem Kältemittel Propan die höchsten Vorlauftemperaturen von 70 °C. Teilweise gibt es R290-Wärmepumpen, die sogar Heizungswasser-Vorlauftemperaturen bis zu 80 °C liefern. R32 und R407C mit einem Mittelwert von 60 °C, sowie R410A mit 65 °C sind demnach bei Anwendungsfällen mit höheren Temperaturanforderungen weniger geeignet.</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/Abb5-roland-final.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Abbildung 5: Maximale Heizungswasser-Vorlauftemperaturen (WTOL) bei unterschiedlichen Kältemittel</figcaption>
+  </figure>
+
+  <h2>Schallpegel</h2>
+  <p>Bei Wärmepumpen ist ebenfalls die Geräuschentwicklung von Interesse. Diese wird auf den Datenblättern getrennt nach Schalldruck innen und außen als gewichteter Schalldruckpegel in dB(A) ausgewiesen. Geprüft wird der Schalldruckpegel nach Norm DIN EN 12102-1, in der das Vorgehen zur Bestimmung des Schallleistungspegels von luftgekühlten Klimageräten, Wärmepumpen und Entfeuchtern festgelegt ist. Die Innenlautstärke wird dabei nur für Split- und innenaufgestellte Geräte ausgewiesen; die Außenlautstärke für alle WP-Typen. Abbildung 6 zeigt die Verteilung der Schalldruckpegel, wobei der innere Schalldruckpegel mit einem Medianwert von 42 dB(A) deutlich geringer ausfällt als der äußere Schalldruckpegel mit 60 dB(A). Interessant ist auch die große Schwankungsbreite zwischen den Wärmepumpen-Modellen: vor allem die Schallbelastung außen zeigt eine große Spreizung mit Werten zwischen 35 dB(A) und 95 dB(A).</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/boxplot_schall_neu1.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Abbildung 6: Schalldruckpegel Innen und Außen in dB(A) mit Median.</figcaption>
+  </figure>
+
+  <p>Tabelle 2 fasst die wichtigsten Leistungs-, Schall- und Temperaturwerte mit Minimal- und Maximalwerten sowie den Werten des 1., 2. und 3. Quantils zusammen. Die Tabelle erlaubt damit, einzelne WP-Modelle hinsichtlich ihrer Leistung in die Gesamtschau von Wärmepumpen einzugruppieren und ist somit besonders für potentielle Wärmepumpen-Käufer, Fachplaner und Installateure relevant.</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/tabelle2_statistik.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Tabelle 2: Statistische Übersicht der wichtigsten Kenngrößen mit Mittelwert, Minimal- und Maximalwerten und drei Quartile</figcaption>
+  </figure>
+
+  <h2>Entwicklungstrends</h2>
+  <p>Unter Berücksichtigung des Zertifizierungsdatums lassen sich Entwicklungstrends identifizieren. Aufgrund der F-Gas-Verordnung der Europäischen Union sind Wärmepumpenhersteller verpflichtet, die Menge klimaschädlicher fluorierter Kältemittel (F-Gase) zu reduzieren. Dies fördert den Trend zu Niedrig-GWP-Kältemitteln, insbesondere R32 mit einem GWP von 675 und R290 (Propan) mit einem GWP von 3. Im Jahr 2016 und 2017 setzen über 80 % der Wärmepumpen das Kältemittel R410A (GWP = 2088) ein. Seit 2018 gewinnt R32 an Bedeutung und erreicht 2021 einen Höchstanteil von 79 %. Ab 2022 stieg der Anteil von R290 kontinuierlich an und liegt 2024 bei 38 %.</p>
+
+  <figure>
+    <div class="viz-frame">
+      <iframe src="visualisation/Zertifizierung1.html" loading="lazy"></iframe>
+    </div>
+    <figcaption>Abbildung 7: Entwicklungstrends und Anteile Kältemittel</figcaption>
+  </figure>
+
+  <p>Hinsichtlich der Leistungsdaten sind nur geringfügige Veränderungen über die Jahre festzustellen. Die saisonale Effizienz SCOP bei einer Heiztemperatur von 35 °C steigt im Mittel von 4,62 im Jahr 2017 auf 4,75 im Jahr 2024. Dies entspricht einer Effizienzsteigerung von ca. 3 %. Bei einer Heiztemperatur von 55 °C, sowie bei den COP-Nennwerten sind die Veränderungen in einer ähnlichen Liga. Lediglich bei den maximalen Vorlauftemperaturen ist ein klarer Trend zu höheren Temperaturen festzustellen (2017: 57 °C, 2024: 62 °C). Dies ist u.a. auf die größere Verbreitung von R290 zurückzuführen.</p>
+  <p>Es sei darauf hingewiesen, dass die Auswertung auf dem aktuellen Stand der Keymark-Datenbank basiert. Kennwerte von Modellen, die nicht mehr in der Datenbank geführt werden, liegen nicht vor. Außerdem umfassen die Jahre 2016–2018 nur wenige Modelle. Beide Effekte können zu leichten Verzerrungen der Darstellung führen. Zudem werden keine Marktanteile dargestellt, sondern lediglich die jährlichen Zertifizierungen zusammengefasst.</p>
+
+  <h2>Zusammenfassung</h2>
+  <p>Die vorliegende datenbasierten und statistischen Auswertung der zertifizierten Wärmepumpen-Modelle der Heat Pump Keymark-Datenbank zeichnet ein detailliertes Bild des aktuellen Stands der Wärmepumpentechnologie. In einem dynamischen Wärmepumpenmarkt ist es so möglich, Wärmepumpen im Vergleich zum Marktumfeld hinsichtlich Leistungsdaten, Temperaturwerte und Schallemissionen einzuordnen und zu vergleichen. Außerdem lässt sich der Trend zum natürlichen Kältemittel Propan sowie zu höheren Vorlauftemperaturen identifizieren.</p>
+  <p>Die Auswertung stellt jedoch nur ein aktueller Ausschnitt der zertifizierten Wärmepumpen-Modelle dar. Sie ist nicht repräsentativ mit den installierten Modellen, da hierfür keine Marktdaten vorliegen. Für zukünftige Auswertungen wäre denkbar, die Keymark-Datenbank mit weiteren Datensätze zu kombinieren, wie zum Beispiel Listenpreisen, um damit ein besseres Verständnis des Zusammenhangs von Leistungsdaten und Preisen zu bekommen.</p>
+
+  <hr class="section-rule">
+
+  <h2>Literatur</h2>
+  <ol class="lit-list">
+    <li id="quelle1"><span class="num">[1]</span> EHPA, 2025. Heat Pump KEYMARK [WWW Document]. URL <a href="https://keymark.eu/en/products/heatpumps/heat-pumps">https://keymark.eu/en/products/heatpumps/heat-pumps</a> (accessed 2.13.25). <a class="back-to-text" href="#ref1a">↩ zurück zum Text</a></li>
+    <li id="quelle2"><span class="num">[2]</span> EU, 2013. Commission Regulation (EU) No 813/2013 of 2 August 2013 implementing Directive 2009/125/EC of the European Parliament and of the Council with regard to ecodesign requirements for space heaters and combination heaters. Text with EEA relevance. <a class="back-to-text" href="#ref2a">↩ zurück zum Text</a></li>
+    <li id="quelle3"><span class="num">[3]</span> Günther, D., 2025. WP-QS im Bestand – Entwicklung optimierter Versorgungskonzepte und nachhaltiger Qualitätssicherungsmaßnahmen für Wärmepumpen im EFH-Bestand - Fraunhofer ISE [WWW Document]. Fraunhofer-Inst. Für Solare Energiesysteme ISE. URL <a href="https://www.ise.fraunhofer.de/de/forschungsprojekte/wp-qs-im-bestand.html">https://www.ise.fraunhofer.de/de/forschungsprojekte/wp-qs-im-bestand.html</a> (accessed 2.13.25). <a class="back-to-text" href="#ref3a">↩ zurück zum Text</a></li>
+    <li id="quelle4"><span class="num">[4]</span> Lämmle, M., Metz, J., Kropp, M., Wapler, J., Oltersdorf, T., Günther, D., Herkel, S., Bongs, C., 2023. Heat Pump Systems in Existing Multifamily Buildings: A Meta‐Analysis of Field Measurement Data Focusing on the Relationship of Temperature and Performance of Heat Pump Systems. Energy Technol. 11, 1–12. <a href="https://doi.org/10.1002/ente.202300379">https://doi.org/10.1002/ente.202300379</a> <a class="back-to-text" href="#ref4a">↩ zurück zum Text</a></li>
+    <li id="quelle5"><span class="num">[5]</span> Oltersdorf, T., Nienborg, B., Fugmann, H., Miara, M., 2022. Stand der Technk von Haushaltswärmepumpen in Europa - Eine Breitenanalyse. DKV Jahrestag. Magdeburg. <a class="back-to-text" href="#ref5a">↩ zurück zum Text</a></li>
+  </ol>
+
+  <hr class="section-rule">
+
+  <div class="author-block">
+    <img src="visualisation/Images/manuel_Laemmle.jpg" alt="Manuel Lämmle">
+    <div>
+      <p class="author-name">Manuel Lämmle</p>
+      <p class="author-source">Quelle: HS Offenburg</p>
+      <p class="author-bio">Manuel Lämmle ist seit 2023 Professor für Energieinformatik an der Hochschule Offenburg und leitet die Forschungsgruppe „Energieeffiziente Gebäudetechnik". Zuvor forschte er am Fraunhofer ISE und an der Universität Freiburg an smarten Energiekonzepten für Gebäude und Quartiere.</p>
+    </div>
+  </div>
+
+  <div class="author-block">
+    <img src="visualisation/Images/leroy_Tomás.png" alt="Leroy Tomás">
+    <div>
+      <p class="author-name">Leroy Tomás</p>
+      <p class="author-source">Quelle: HS Offenburg</p>
+      <p class="author-bio">Leroy Tomás ist seit 2020 wissenschaftlicher Mitarbeiter am Institut für nachhaltige Energiesysteme und studierte zuvor Erneuerbare Energien und Daten Engineering an der Hochschule Offenburg.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Wärmepumpen-Analyse · Bericht
+</footer>
+
+</body>
+</html>
